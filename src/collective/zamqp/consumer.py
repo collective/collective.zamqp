@@ -261,7 +261,7 @@ class ConsumingView(BrowserView):
             except ConflictError:
                 logger.error(("Conflict while working on message '%s' "
                               "(status = '%s')"),
-                             self.delivery_tag, self.message.state)
+                             delivery_tag, message.state)
                 message.state = "ERROR"
                 raise
             except:

@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.7.18 (2012-08-10)
+-------------------
+
+- Bug fixes.
+  [malthe]
+- Added plone.testing layer for RabbitMQ + Zope. Added a dummy test for the
+  layer. Enabled RabbitMQ-parts in test buildout.
+- Fixed consumers and producers to use the default exchange by default to allow
+  the easiest possible configuration for the use of the default exchange only.
+
 
 0.7.17 (2012-05-21)
 -------------------

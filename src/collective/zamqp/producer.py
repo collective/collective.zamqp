@@ -258,6 +258,8 @@ class Producer(grok.GlobalUtility, VTM):
                             'wait for the new connection: %s'), kwargs)
             retry_callback = retry_constructor(self._basic_publish, kwargs)
             self._callbacks.add(0, '_on_ready_to_publish', retry_callback)
+            # XXX: Pika's CallbackManager is not threadsafe and this method
+            # is being called from the worker threads. Needs threadlock!
             return False
 
     def _tx_commit(self):

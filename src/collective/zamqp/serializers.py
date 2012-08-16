@@ -72,3 +72,30 @@ try:
 
 except ImportError:
     pass
+
+
+try:
+    try:
+        import simplejson as json
+        json  # pyflakes
+    except ImportError:
+        import json
+
+    class JSONSerializer(grok.GlobalUtility):
+        grok.provides(ISerializer)
+        grok.name("json")
+
+        content_type = "application/x-json"
+
+        def serialize(self, body):
+            return json.dumps(body)
+
+        def deserialize(self, body):
+            return json.loads(body)
+
+    class JSONSerializerByMimeType(MessagePackSerializer):
+        grok.provides(ISerializer)
+        grok.name(JSONSerializer.content_type)
+
+except ImportError:
+    pass

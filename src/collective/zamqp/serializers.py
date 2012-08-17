@@ -28,6 +28,11 @@ class PlainTextSerializer(grok.GlobalUtility):
         return body
 
 
+class PlainTextSerializerAlias(PlainTextSerializer):
+    grok.provides(ISerializer)
+    grok.name("plain")
+
+
 class PlainTextSerializerByMimeType(PlainTextSerializer):
     grok.provides(ISerializer)
     grok.name(PlainTextSerializer.content_type)
@@ -93,9 +98,13 @@ try:
         def deserialize(self, body):
             return json.loads(body)
 
-    class JSONSerializerByMimeType(MessagePackSerializer):
+    class JSONSerializerByMimeType(JSONSerializer):
         grok.provides(ISerializer)
         grok.name(JSONSerializer.content_type)
+
+    class JSONSerializerByMimeTypeAlias(JSONSerializer):
+        grok.provides(ISerializer)
+        grok.name("application/json")
 
 except ImportError:
     pass

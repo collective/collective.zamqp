@@ -148,7 +148,8 @@ class Producer(grok.GlobalUtility, VTM):
     def on_channel_open(self, channel):
         self._channel = channel
 
-        if self.auto_declare and self.exchange:
+        if self.auto_declare and self.exchange\
+            and not self.exchange.startswith('amq.'):
             self.declare_exchange()
         elif self.auto_declare and self.queue:
             self.declare_queue()

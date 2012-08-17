@@ -145,7 +145,8 @@ class Consumer(grok.GlobalUtility):
         self._tx_select = tx_select
         self._message_received_callback = on_message_received
 
-        if self.auto_declare and self.exchange:
+        if self.auto_declare and self.exchange\
+            and not self.exchange.startswith('amq.'):
             self.declare_exchange()
         elif self.auto_declare and self.queue:
             self.declare_queue()

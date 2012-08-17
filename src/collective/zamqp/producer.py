@@ -151,7 +151,8 @@ class Producer(grok.GlobalUtility, VTM):
         if self.auto_declare and self.exchange\
             and not self.exchange.startswith('amq.'):
             self.declare_exchange()
-        elif self.auto_declare and self.queue:
+        elif self.auto_declare and self.queue is not None\
+            and not self.queue.startswith('amq.'):
             self.declare_queue()
         else:
             self.on_ready_to_publish()
@@ -165,7 +166,8 @@ class Producer(grok.GlobalUtility, VTM):
 
     def on_exchange_declared(self, frame):
         logger.info("Producer declared exchange '%s'", self.exchange)
-        if self.auto_declare and self.queue:
+        if self.auto_declare and self.queue is not None\
+            and not self.queue.startswith('amq.'):
             self.declare_queue()
         else:
             self.on_ready_to_publish()

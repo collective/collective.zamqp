@@ -185,14 +185,28 @@ class ConsumingServer(object):
                 kwargs = dict(k for k in kwargs.items() if k[1] is not None)
 
                 # Substitute ${site_id} to support site specific queues:
-                substitutable = ("queue", "routing_key")
-                for key in [k for k in substitutable if k in kwargs]:
-                    value = kwargs[key].replace("${site_id}", self.site_id)
-                    kwargs[key] = value
+                for key in ('queue', 'routing_key'):
+                    value = getattr(consumerUtility, key, None)
+                    if value and "${site_id}" in value:
+                        kwargs[key] = value.replace("${site_id}", self.site_id)
                 substituted_name = name.replace("${site_id}", self.site_id)
 
                 # Clone the consumer
-                clonedConsumerUtility = consumerUtility.__class__(**kwargs)
+                params = ['connection_id',
+                          'exchange',
+                          'routing_key',
+                          'durable',
+                          'exchange_type',
+                          'exchange_durable',
+                          'queue',
+                          'queue_durable',
+                          'queue_exclusive',
+                          'queue_arguments',
+                          'auto_declare',
+                          'auto_ack',
+                          'marker']
+                clonedConsumerUtility = consumerUtility.__class__(
+                    **dict(k for k in kwargs.items() if k[0] in params))
                 if name != substituted_name:
                     # When the consumer name contains substitution, we are
                     # able to register site specific consumers for lookup!

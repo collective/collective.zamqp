@@ -2,11 +2,10 @@
 ###
 # collective.zamqp
 #
-# Licensed under the GPL license, see LICENCE.txt for more details.
+# Licensed under the ZPL license, see LICENCE.txt for more details.
 #
-# Copyright (c) 2012 University of Jyväskylä
+# Copyright (c) 2012 University of Jyväskylä and Contributors.
 ###
-from plone.memoize import view
 """ZConfig datatype support for AMQP Consuming Server"""
 
 
@@ -91,7 +90,7 @@ class BrokerConnectionFactory(object):
             # just in case, store the created utilities, view and server
             connection._keepalive = {"producer": producer,
                                      "consumer": consumer,
-                                     "view": view,
+                                     "view": ping,
                                      "clock": clock}
 
         return connection

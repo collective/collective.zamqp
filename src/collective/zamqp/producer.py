@@ -28,12 +28,6 @@ from pika.callback import CallbackManager
 import logging
 logger = logging.getLogger('collective.zamqp')
 
-threadlocal = threading.local()  # storage for thread-safe attributes
-
-# XXX: The threadlocal storage was made module-level attribute for debugging
-# purporses (instance specific values are stored using repr() as their key),
-# but should eventually be moved into an instance property.
-
 
 class Producer(grok.GlobalUtility, VTM):
     """Producer utility base class"""
@@ -67,6 +61,7 @@ class Producer(grok.GlobalUtility, VTM):
                  serializer=None):
 
         self._connection = None
+        self._threadlocal = threading.local()  # to thread-safe some attributes
 
         # Allow class variables to provide defaults for:
 
@@ -290,45 +285,30 @@ class Producer(grok.GlobalUtility, VTM):
     # Define thread-safe VTM._v_registered:
 
     def _get_v_registered(self):
-        if hasattr(threadlocal, "collective_zamqp_v_registered"):
-            return threadlocal.collective_zamqp_v_registered.get(str(self))
-        else:
-            return 0
+        return getattr(self._threadlocal, "_v_registered", 0)
 
     def _set_v_registered(self, value):
-        if not hasattr(threadlocal, "collective_zamqp_v_registered"):
-            threadlocal.collective_zamqp_v_registered = {}
-        threadlocal.collective_zamqp_v_registered[str(self)] = value
+        self._threadlocal._v_registered = value
 
     _v_registered = property(_get_v_registered, _set_v_registered)
 
     # Define thread-safe VMT._v_finalize:
 
     def _get_v_finalize(self):
-        if hasattr(threadlocal, "collective_zamqp_v_finalize"):
-            return threadlocal.collective_zamqp_v_finalize.get(str(self))
-        else:
-            return 0
+        return getattr(self._threadlocal, "_v_finalize", 0)
 
     def _set_v_finalize(self, value):
-        if not hasattr(threadlocal, "collective_zamqp_v_finalize"):
-            threadlocal.collective_zamqp_v_finalize = {}
-        threadlocal.collective_zamqp_v_finalize[str(self)] = value
+        self._threadlocal._v_finalize = value
 
     _v_finalize = property(_get_v_finalize, _set_v_finalize)
 
     # Define thread-safe self._pending_messages:
 
     def _get_pending_messages(self):
-        if hasattr(threadlocal, "collective_zamqp_pending_messages"):
-            return threadlocal.collective_zamqp_pending_messages.get(str(self))
-        else:
-            return None
+        return getattr(self._threadlocal, "_pending_messages", None)
 
     def _set_pending_messages(self, value):
-        if not hasattr(threadlocal, "collective_zamqp_pending_messages"):
-            threadlocal.collective_zamqp_pending_messages = {}
-        threadlocal.collective_zamqp_pending_messages[str(self)] = value
+        self._threadlocal._pending_messages = value
 
     _pending_messages = property(_get_pending_messages, _set_pending_messages)
 

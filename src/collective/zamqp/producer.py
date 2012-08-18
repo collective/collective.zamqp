@@ -61,6 +61,7 @@ class Producer(grok.GlobalUtility, VTM):
                  serializer=None):
 
         self._connection = None
+        self._lock = threading.Lock()
         self._threadlocal = threading.local()  # to thread-safe some attributes
 
         # Allow class variables to provide defaults for:
@@ -258,9 +259,10 @@ class Producer(grok.GlobalUtility, VTM):
             logger.warning(('No connection. Durable message will be left to '
                             'wait for the new connection: %s'), kwargs)
             retry_callback = retry_constructor(self._basic_publish, kwargs)
-            self._callbacks.add(0, '_on_ready_to_publish', retry_callback)
-            # XXX: Pika's CallbackManager is not threadsafe and this method
-            # is being called from the worker threads. Needs threadlock!
+            with self._lock:
+                self._callbacks.add(0, '_on_ready_to_publish', retry_callback)
+            # XXX: ^^^ When connection is down, durable messages should be
+            # stored in ZODB to prevent losing them, e.g. because of restart.
             return False
 
     def _tx_commit(self):

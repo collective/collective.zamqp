@@ -202,6 +202,14 @@ class Producer(grok.GlobalUtility, VTM):
                     self.exchange, self.routing_key)
         self._callbacks.process(0, "_on_ready_to_publish", self)
 
+    @property
+    def connected(self):
+        if getattr(self._connection, "is_open", False)\
+            and getattr(self, '_channel', None):
+            return True
+        else:
+            return False
+
     def publish(self, message, exchange=None, routing_key=None,
                 mandatory=False, immediate=False,
                 content_type=None, content_encoding=None,

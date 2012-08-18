@@ -21,6 +21,7 @@ from zope.component import getUtility, queryUtility, provideHandler
 from collective.zamqp.interfaces import\
     IProducer, IBrokerConnection, IBeforeBrokerConnectEvent, ISerializer
 from collective.zamqp.transactionmanager import VTM
+from collective.zamqp.connection import BlockingChannel
 
 from pika import BasicProperties
 from pika.callback import CallbackManager
@@ -256,6 +257,19 @@ class Producer(grok.GlobalUtility, VTM):
             self._pending_messages.insert(0, msg)
         elif self._basic_publish(**msg) and self._connection.tx_select:
             self._tx_commit()  # minimal support for transactional channel
+
+    def __len__(self):
+        """Return message count of the target queue"""
+        # XXX: Producer knows it target queue only, if it's explicitly
+        # set in its definition. Otherwise self._queue is None
+        connection = getUtility(IBrokerConnection, name=self.connection_id)
+        with BlockingChannel(connection) as channel:
+            frame = channel.queue_declare(queue=self._queue,
+                                          durable=self.queue_durable,
+                                          exclusive=self.queue_exclusive,
+                                          auto_delete=not self.queue_durable,
+                                          arguments=self.queue_arguments)
+            return frame.method.message_count
 
     def _basic_publish(self, **kwargs):
         retry_constructor = lambda func, kwargs: lambda: func(**kwargs)

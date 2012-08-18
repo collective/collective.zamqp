@@ -23,7 +23,7 @@ from AccessControl.SecurityManagement import getSecurityManager
 from ZODB.POSException import ConflictError
 
 from zope.interface import alsoProvides
-from zope.component import createObject, queryUtility
+from zope.component import createObject, getUtility, queryUtility
 from zope.event import notify
 
 try:
@@ -34,7 +34,9 @@ except ImportError:  # BBB
 
 from Products.Five.browser import BrowserView
 
-from collective.zamqp.interfaces import IConsumer, IErrorHandler
+from collective.zamqp.interfaces import\
+    IBrokerConnection, IConsumer, IErrorHandler
+from collective.zamqp.connection import BlockingChannel
 
 import logging
 logger = logging.getLogger('collective.zamqp')
@@ -219,6 +221,16 @@ class Consumer(grok.GlobalUtility):
             message.ack()  # immediate ack here (doesn't wait for transaction)
 
         self._message_received_callback(message)
+
+    def __len__(self):
+        connection = getUtility(IBrokerConnection, name=self.connection_id)
+        with BlockingChannel(connection) as channel:
+            frame = channel.queue_declare(queue=self._queue,
+                                          durable=self.queue_durable,
+                                          exclusive=self.queue_exclusive,
+                                          auto_delete=not self.queue_durable,
+                                          arguments=self.queue_arguments)
+            return frame.method.message_count
 
 
 class security_manager:

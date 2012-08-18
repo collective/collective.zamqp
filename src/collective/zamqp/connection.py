@@ -20,7 +20,7 @@ import threading
 
 import grokcore.component as grok
 
-from zope.component import getUtilitiesFor
+from zope.component import getUtility, getUtilitiesFor
 from zope.interface import implements
 from zope.event import notify
 
@@ -350,13 +350,10 @@ class BlockingChannel:
 
     Usage::
 
-        from collective.zamqp.interfaces import IBrokerConnection
         from collective.zamqp.connection import BlockingChannel
 
-        my_conn = getUtility(IBrokerConnection, name="connection-id")
-
-        with BlockingChannel(my_conn) as channel:
-            my_chan = cannel.declare_queue(auto_delete=True)
+        with BlockingChannel(connection_id) as channel:
+            frame = channel.declare_queue(auto_delete=True)
             # ...
 
     Refer to Pika's API on how to use the raw channel-object. E.g. you
@@ -365,6 +362,9 @@ class BlockingChannel:
     """
 
     def __init__(self, connection, timeout=60):
+        # If only connection_id is provided, look up the connection.
+        if not IBrokerConnection.providedBy(connection):
+            connection = getUtility(IBrokerConnection, name=connection)
         # Prepare a new one-shot blocking connection
         credentials = PlainCredentials(
             connection.username, connection.password, erase_on_connect=False)

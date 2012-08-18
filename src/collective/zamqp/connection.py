@@ -24,7 +24,7 @@ from zope.component import getUtilitiesFor
 from zope.interface import implements
 from zope.event import notify
 
-from pika import PlainCredentials, ConnectionParameters
+from pika import PlainCredentials, ConnectionParameters, BlockingConnection
 from pika.adapters.asyncore_connection import\
     AsyncoreDispatcher as AsyncoreDispatcherBase
 from pika.adapters.asyncore_connection import\
@@ -341,6 +341,55 @@ class BrokerConnection(grok.GlobalUtility):
 
     def on_channel_tx_select(self, frame):
         self._callbacks.process(0, '_on_channel_open', self, self._channel)
+
+
+class BlockingChannel:
+    """Provides raw blocking Pika channel object for given BrokerConnection.
+    The created connection is closed automatically after 'with' statement has
+    been closed.
+
+    Usage::
+
+        from collective.zamqp.interfaces import IBrokerConnection
+        from collective.zamqp.connection import BlockingChannel
+
+        my_conn = getUtility(IBrokerConnection, name="connection-id")
+
+        with BlockingChannel(my_conn) as channel:
+            my_chan = cannel.declare_queue(auto_delete=True)
+            # ...
+
+    Refer to Pika's API on how to use the raw channel-object. E.g. you
+    could use it to declare a channel to retrieve the amount of messages
+    still waiting on that channel.
+    """
+
+    def __init__(self, connection, timeout=60):
+        # Prepare a new one-shot blocking connection
+        credentials = PlainCredentials(
+            connection.username, connection.password, erase_on_connect=False)
+        parameters = ConnectionParameters(
+            connection.hostname, connection.port, connection.virtual_host,
+            credentials=credentials, heartbeat=True)
+        # AMQP-heartbeat timeout must be set manually due to bug in pika 0.9.5:
+        if parameters.heartbeat:
+            parameters.heartbeat = timeout
+        # Create the connection and reset channel
+        self.connection = BlockingConnection(parameters=parameters)
+        self.channel = None
+
+    def __enter__(self):
+        # Open and return a new channel
+        self.channel = self.connection.channel()
+        return self.channel
+
+    def __exit__(self, type, value, traceback):
+        # self.channel.close()  # broken in pika 0.9.5
+        self.connection.close()
+        # XXX: Probably due to a bug in channel.close in Pika 0.9.5
+        # the connection is not really closed here. Luckily, the channel
+        # closes and therefore you are safe. Eventually, AMQP heartbeat
+        # timeouts and really closes the connection.
 
 
 class BeforeBrokerConnectEvent(object):

@@ -71,6 +71,8 @@ class Consumer(grok.GlobalUtility):
                  queue_arguments=None, auto_declare=None, auto_ack=None,
                  marker=None):
 
+        self._queue = None  # will default to self.queue
+
         # Allow class variables to provide defaults for:
 
         # connection_id
@@ -104,7 +106,7 @@ class Consumer(grok.GlobalUtility):
         if self.queue is None and queue is None:
             queue = getattr(self, 'grokcore.component.directive.name', None)
         if queue is not None:
-            self.queue = queue
+            self._queue = self.queue = queue
         assert self.queue is not None,\
                u"Consumer configuration is missing queue."
         # routing_key
@@ -181,25 +183,27 @@ class Consumer(grok.GlobalUtility):
                                     callback=self.on_queue_declared)
 
     def on_queue_declared(self, frame):
-        logger.info("Consumer declared queue '%s'", self.queue)
+        self._queue = frame.method.queue  # get the real queue name
+        logger.info("Consumer declared queue '%s'", self._queue)
         if self.auto_declare and self.exchange:
             self.bind_queue()
         else:
             self.on_ready_to_consume()
 
     def bind_queue(self):
-        self._channel.queue_bind(exchange=self.exchange, queue=self.queue,
+        self._channel.queue_bind(exchange=self.exchange, queue=self._queue,
                                  routing_key=self.routing_key,
                                  callback=self.on_queue_bound)
 
     def on_queue_bound(self, frame):
         logger.info("Consumer bound queue '%s' to exchange '%s'",
-                    self.queue, self.exchange)
+                    self._queue, self.exchange)
         self.on_ready_to_consume()
 
     def on_ready_to_consume(self):
-        logger.info("Consumer ready to consume queue '%s'", self.queue)
-        self._channel.basic_consume(self.on_message_received, queue=self.queue)
+        logger.info("Consumer ready to consume queue '%s'", self._queue)
+        self._channel.basic_consume(self.on_message_received,
+                                    queue=self._queue)
 
     def on_message_received(self, channel, method_frame, header_frame, body):
         message = createObject('AMQPMessage',

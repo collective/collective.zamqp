@@ -61,6 +61,7 @@ class Producer(grok.GlobalUtility, VTM):
                  serializer=None):
 
         self._connection = None
+        self._queue = None  # will default to self.queue
         self._lock = threading.Lock()
         self._threadlocal = threading.local()  # to thread-safe some attributes
 
@@ -101,8 +102,8 @@ class Producer(grok.GlobalUtility, VTM):
             self.exchange_durable = self.durable
 
         # queue
-        if queue:
-            self.queue = queue
+        if queue is not None:
+            self._queue = self.queue = queue
         # queue_durable
         if queue_durable is not None:
             self.queue_durable = queue_durable
@@ -180,20 +181,21 @@ class Producer(grok.GlobalUtility, VTM):
                                     callback=self.on_queue_declared)
 
     def on_queue_declared(self, frame):
-        logger.info("Producer declared queue '%s'", self.queue)
+        self._queue = frame.method.queue  # get the real queue name
+        logger.info("Producer declared queue '%s'", self._queue)
         if self.auto_declare and self.exchange:
             self.bind_queue()
         else:
             self.on_ready_to_publish()
 
     def bind_queue(self):
-        self._channel.queue_bind(exchange=self.exchange, queue=self.queue,
-                                 routing_key=self.routing_key or self.queue,
+        self._channel.queue_bind(exchange=self.exchange, queue=self._queue,
+                                 routing_key=self.routing_key or self._queue,
                                  callback=self.on_queue_bound)
 
     def on_queue_bound(self, frame):
         logger.info("Producer bound queue '%s' to exchange '%s'",
-                    self.queue, self.exchange)
+                    self._queue, self.exchange)
         self.on_ready_to_publish()
 
     def on_ready_to_publish(self):

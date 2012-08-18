@@ -40,6 +40,7 @@ logger = logging.getLogger('collective.zamqp')
 
 
 class AsyncoreScheduling(asyncore.dispatcher):
+    """Once firing asyncore based timer for executing a callback"""
 
     def __init__(self, callback, timeout):
         asyncore.dispatcher.__init__(self)
@@ -72,6 +73,7 @@ class AsyncoreScheduling(asyncore.dispatcher):
 
 
 class LockingSimpleBuffer(SimpleBuffer):
+    """Thread-safe locking buffer for Pika"""
 
     def __init__(self, data=None):
         super(LockingSimpleBuffer, self).__init__(data)
@@ -123,6 +125,10 @@ class LockingSimpleBuffer(SimpleBuffer):
 class AsyncoreDispatcher(AsyncoreDispatcherBase):
     __doc__ = AsyncoreDispatcherBase.__doc__
 
+    # Patched asyncore dispatcher for Pika to activate
+    # Pika's support for AMQP heartbeat within Zope's
+    # asyncore based lifetime loop.
+
     def handle_read(self):
         AsyncoreDispatcherBase.handle_read(self)
         self._process_timeouts()
@@ -130,6 +136,9 @@ class AsyncoreDispatcher(AsyncoreDispatcherBase):
 
 class AsyncoreConnection(AsyncoreConnectionBase):
     __doc__ = AsyncoreConnectionBase.__doc__
+
+    # Patched asyncore connection for Pika. We introduce some thread-safety
+    # patches and re-connection procedures.
 
     def __init__(self, parameters=None, on_open_callback=None,
                  reconnection_strategy=None):
@@ -153,6 +162,8 @@ class AsyncoreConnection(AsyncoreConnectionBase):
         self.socket = self.ioloop.socket
 
     def _send_method(self, channel_number, method, content=None):
+        # Method may contain multiple frames and frames from different
+        # methods must not collide. Therefore locking (for thread-safety).
         with self.lock:
             return super(AsyncoreConnection, self)._send_method(
                 channel_number, method, content)
@@ -190,6 +201,7 @@ class AsyncoreConnection(AsyncoreConnectionBase):
 
     def _init_connection_state(self):
         super(AsyncoreConnection, self)._init_connection_state()
+        # Enable our custom locking (thread-safe) buffer
         self.outbound_buffer = LockingSimpleBuffer()
 
 

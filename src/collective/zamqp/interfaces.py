@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
-"""
-collective.zamqp
+###
+# collective.zamqp
+#
+# Licensed under the ZPL license, see LICENCE.txt for more details.
+#
+# Copyright (c) 2012 University of Jyväskylä and Contributors.
+###
+# This module is a derivate of affinitic.zamqp.interfaces.
+#
+# Copyright by Affinitic sprl
+###
 
-Licensed under the GPL license, see LICENCE.txt for more details.
-
-Copyright by Affinitic sprl
-Copyright by University of Jyväskylä
-"""
 from zope.interface import Interface, Attribute
 from zope.component.interfaces import IObjectEvent
 

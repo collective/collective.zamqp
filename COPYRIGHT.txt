@@ -1,0 +1,7 @@
+collective.zamqp is
+
+copyrighted by University of Jyväskylä and Contributors.
+
+collective.zamqp is partially a derivate of affinitic.zamqp, which is
+
+copyrighted by Affinitic sprl.

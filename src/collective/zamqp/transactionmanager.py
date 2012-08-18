@@ -11,7 +11,6 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-
 """Provide support for linking an external transaction manager with Zope's"""
 
 import transaction

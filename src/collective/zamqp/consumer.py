@@ -2,10 +2,13 @@
 ###
 # collective.zamqp
 #
-# Licensed under the GPL license, see LICENCE.txt for more details.
+# Licensed under the ZPL license, see LICENCE.txt for more details.
+#
+# Copyright (c) 2012 University of Jyväskylä and Contributors.
+###
+# This module is a derivate of affinitic.zamqp.consumer.
 #
 # Copyright by Affinitic sprl
-# Copyright (c) 2012 University of Jyväskylä
 ###
 """Consumer utility base class"""
 

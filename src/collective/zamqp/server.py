@@ -2,9 +2,9 @@
 ###
 # collective.zamqp
 #
-# Licensed under the GPL license, see LICENCE.txt for more details.
+# Licensed under the ZPL license, see LICENCE.txt for more details.
 #
-# Copyright (c) 2012 University of Jyväskylä
+# Copyright (c) 2012 University of Jyväskylä and Contributors.
 ###
 # This module is a derivate of a work by Chris McDonough for Zope ClockServer.
 #

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+###
+# collective.zamqp
+#
+# Licensed under the ZPL license, see LICENCE.txt for more details.
+#
+# Copyright (c) 2012 University of Jyväskylä and Contributors.
+###
 """
-collective.zamqp
-
-Licensed under the GPL license, see LICENCE.txt for more details.
-
-Copyright by University of Jyväskylä
-
 Base classes for registering ping to keep the connection alive in environments,
 where firewalls close idle connections. In addition, ping causes enough socket
 traffic (for asyncore) to help re-connections on otherwise silent

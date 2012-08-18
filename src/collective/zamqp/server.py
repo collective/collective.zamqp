@@ -177,16 +177,20 @@ class ConsumingServer(object):
             if consumerUtility.connection_id == self.connection_id:
                 # To support multiple sites (multiple consuming servers for
                 # a single connection) and still keep consumers simple, every
-                # consuming server must get own cloned instance of a consumer.
+                # consuming server must get its own cloned instance of a
+                # consumer.
+
                 # Get the consumer configuration:
                 kwargs = consumerUtility.__dict__.copy() # instance properties
                 kwargs = dict(k for k in kwargs.items() if k[1] is not None)
+
                 # Substitute ${site_id} to support site specific queues:
                 substitutable = ("queue", "routing_key")
                 for key in [k for k in substitutable if k in kwargs]:
                     value = kwargs[key].replace("${site_id}", self.site_id)
                     kwargs[key] = value
                 substituted_name = name.replace("${site_id}", self.site_id)
+
                 # Clone the consumer
                 clonedConsumerUtility = consumerUtility.__class__(**kwargs)
                 if name != substituted_name:
@@ -194,6 +198,7 @@ class ConsumingServer(object):
                     # able to register site specific consumers for lookup!
                     provideUtility(clonedConsumerUtility, IConsumer,
                                    name=substituted_name)
+
                 # Append the cloned consumer:
                 self.consumers.append(clonedConsumerUtility)
 

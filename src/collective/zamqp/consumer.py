@@ -236,22 +236,26 @@ class Consumer(grok.GlobalUtility):
 class security_manager:
 
     def __init__(self, request, user_id):
-        self.request = request
+        if user_id == 'Anonymous User':
+            # Short circuit for 'Anonymous User' to avoid expensive lookups
+            self.user = None
+        else:
+            self.request = request
 
-        site = getSite()
-        acl_users = site.get('acl_users')
-        if acl_users:
-            user = acl_users.getUser(user_id)
-
-        if not user:
-            root = site.getPhysicalRoot()
-            acl_users = root.get('acl_users')
+            site = getSite()
+            acl_users = site.get('acl_users')
             if acl_users:
                 user = acl_users.getUser(user_id)
-        if user:
-            user = user.__of__(acl_users)
 
-        self.user = user
+            if not user:
+                root = site.getPhysicalRoot()
+                acl_users = root.get('acl_users')
+                if acl_users:
+                    user = acl_users.getUser(user_id)
+            if user:
+                user = user.__of__(acl_users)
+
+            self.user = user
 
     def __enter__(self):
         self.old_security_manager = getSecurityManager()
@@ -277,6 +281,7 @@ class ConsumingView(BrowserView):
 
         message._register()
         event = createObject('AMQPMessageArrivedEvent', message)
+
         with security_manager(self.request, user_id):
             try:
                 notify(event)

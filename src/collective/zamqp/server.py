@@ -138,9 +138,14 @@ class ConsumingServer(object):
         env = self.get_env(req)
         resp = make_response(req, env)
 
-        env["AMQP_MESSAGE"] = message
-        env["AMQP_USER_ID"] = self.user_id
+        env['AMQP_MESSAGE'] = message
+        env['AMQP_USER_ID'] = self.user_id
         zreq = AMQPRequest(out, env, resp)
+
+        headers = getattr(message.header_frame, 'headers', {}) or {}
+        if 'x-cookie-auth' in headers:
+            x_cookie_auth = message.header_frame.headers['x-cookie-auth']
+            zreq.cookies['__ac'] = x_cookie_auth
 
         return req, zreq, resp
 

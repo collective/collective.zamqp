@@ -344,7 +344,7 @@ class BrokerConnection(grok.GlobalUtility):
 
 
 class BlockingChannel:
-    """Provides raw blocking Pika channel object for given BrokerConnection.
+    """Provides raw blocking Pika channel object for given connection id.
     The created connection is closed automatically after 'with' statement has
     been closed.
 
@@ -361,10 +361,9 @@ class BlockingChannel:
     still waiting on that channel.
     """
 
-    def __init__(self, connection, timeout=60):
-        # If only connection_id is provided, look up the connection.
-        if not IBrokerConnection.providedBy(connection):
-            connection = getUtility(IBrokerConnection, name=connection)
+    def __init__(self, connection_id, timeout=60):
+        # Look up the given connection
+        connection = getUtility(IBrokerConnection, name=connection_id)
         # Prepare a new one-shot blocking connection
         credentials = PlainCredentials(
             connection.username, connection.password, erase_on_connect=False)
@@ -386,10 +385,15 @@ class BlockingChannel:
     def __exit__(self, type, value, traceback):
         # self.channel.close()  # broken in pika 0.9.5
         self.connection.close()
+
         # XXX: Probably due to a bug in channel.close in Pika 0.9.5
         # the connection is not really closed here. Luckily, the channel
         # closes and therefore you are safe. Eventually, AMQP heartbeat
         # timeouts and really closes the connection.
+
+        # TODO: Once pika > 0.9.5 has been released and it's safe to
+        # explicitly close blocking channels, this should be able to be
+        # refactored to pool blocking connections within a thread.
 
 
 class BeforeBrokerConnectEvent(object):

@@ -143,8 +143,8 @@ class ConsumingServer(object):
         zreq = AMQPRequest(out, env, resp)
 
         headers = getattr(message.header_frame, 'headers', {}) or {}
-        if 'x-cookie-auth' in headers:
-            x_cookie_auth = message.header_frame.headers['x-cookie-auth']
+        x_cookie_auth = headers.get('x-cookie-auth', None)
+        if x_cookie_auth:
             zreq.cookies['__ac'] = x_cookie_auth
 
         return req, zreq, resp

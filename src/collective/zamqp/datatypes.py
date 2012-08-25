@@ -27,6 +27,9 @@ class BrokerConnectionFactory(object):
         # generate ping-keepalive until heartbeat really works
         self.keepalive = section.keepalive
 
+        # generate default producer with the name of the connection
+        self.producer = section.producer
+
         # just in case, mimic ZServer.datatypes.ServerFactory
         self.ip = self.host = None
 
@@ -92,6 +95,16 @@ class BrokerConnectionFactory(object):
                                      "consumer": consumer,
                                      "view": ping,
                                      "clock": clock}
+
+        if self.producer:
+            # generate default producer with the name of the connection
+            from collective.zamqp.interfaces import IProducer
+            from collective.zamqp.producer import Producer
+
+            producer = Producer(self.connection_id, exchange="",
+                                routing_key="", durable=False,
+                                auto_declare=False)
+            provideUtility(producer, IProducer, name=self.connection_id)
 
         return connection
 

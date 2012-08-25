@@ -49,6 +49,12 @@
        integer timeout in seconds to keep the connection alive.
        </description>
      </key>
+     <key name="producer" datatype="boolean" default="on">
+       <description>
+       Register a default producer for this connection (a producer with no
+       specific routing, with the name of the connection), defaults to on.
+       </description>
+     </key>
   </sectiontype>
 
   <sectiontype name="amqp-consuming-server"

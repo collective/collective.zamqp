@@ -169,7 +169,8 @@ class Consumer(grok.GlobalUtility):
                                        callback=self.on_exchange_declared)
 
     def on_exchange_declared(self, frame):
-        logger.info("Consumer declared exchange '%s'", self.exchange)
+        logger.info("Consumer declared exchange '%s' on connection '%s'",
+                    self.exchange, self.connection_id)
         if self.auto_declare and self.queue is not None\
             and not self.queue.startswith('amq.'):
             self.declare_queue()
@@ -186,7 +187,8 @@ class Consumer(grok.GlobalUtility):
 
     def on_queue_declared(self, frame):
         self._queue = frame.method.queue  # get the real queue name
-        logger.info("Consumer declared queue '%s'", self._queue)
+        logger.info("Consumer declared queue '%s' on connection '%s'",
+                    self._queue, self.connection_id)
         if self.auto_declare and self.exchange:
             self.bind_queue()
         else:
@@ -198,12 +200,14 @@ class Consumer(grok.GlobalUtility):
                                  callback=self.on_queue_bound)
 
     def on_queue_bound(self, frame):
-        logger.info("Consumer bound queue '%s' to exchange '%s'",
-                    self._queue, self.exchange)
+        logger.info(("Consumer bound queue '%s' to exchange '%s' "
+                     "on connection '%s'"),
+                    self._queue, self.exchange, self.connection_id)
         self.on_ready_to_consume()
 
     def on_ready_to_consume(self):
-        logger.info("Consumer ready to consume queue '%s'", self._queue)
+        logger.info("Consumer ready to consume queue '%s' on connection '%s'",
+                    self._queue, self.connection_id)
         self._channel.basic_consume(self.on_message_received,
                                     queue=self._queue)
 

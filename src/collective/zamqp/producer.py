@@ -166,7 +166,8 @@ class Producer(grok.GlobalUtility, VTM):
                                        callback=self.on_exchange_declared)
 
     def on_exchange_declared(self, frame):
-        logger.info("Producer declared exchange '%s'", self.exchange)
+        logger.info("Producer declared exchange '%s' on connection '%s'",
+                    self.exchange, self.connection_id)
         if self.auto_declare and self.queue is not None\
             and not self.queue.startswith('amq.'):
             self.declare_queue()
@@ -183,7 +184,8 @@ class Producer(grok.GlobalUtility, VTM):
 
     def on_queue_declared(self, frame):
         self._queue = frame.method.queue  # get the real queue name
-        logger.info("Producer declared queue '%s'", self._queue)
+        logger.info("Producer declared queue '%s' on connection '%s'",
+                    self._queue, self.connection_id)
         if self.auto_declare and self.exchange:
             self.bind_queue()
         else:
@@ -195,14 +197,15 @@ class Producer(grok.GlobalUtility, VTM):
                                  callback=self.on_queue_bound)
 
     def on_queue_bound(self, frame):
-        logger.info("Producer bound queue '%s' to exchange '%s'",
-                    self._queue, self.exchange)
+        logger.info(("Producer bound queue '%s' to exchange '%s' "
+                     "on connection '%s'"),
+                    self._queue, self.exchange, self.connection_id)
         self.on_ready_to_publish()
 
     def on_ready_to_publish(self):
         logger.info(("Producer ready to publish to exchange '%s' "
-                     "with routing key '%s'"),
-                    self.exchange, self.routing_key)
+                     "with routing key '%s' on connection '%s'"),
+                    self.exchange, self.routing_key, self.connection_id)
         self._callbacks.process(0, "_on_ready_to_publish", self)
 
     @property

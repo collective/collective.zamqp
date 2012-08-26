@@ -56,22 +56,26 @@ class Consumer(grok.GlobalUtility):
 
     exchange_type = 'direct'
     exchange_durable = None
+    exchange_auto_delete = None
 
     queue = None
     queue_durable = None
+    queue_auto_delete = None
     queue_exclusive = False
     queue_arguments = {}
 
     auto_declare = True
+    auto_delete = None
 
     auto_ack = False
     marker = None
 
     def __init__(self, connection_id=None, exchange=None, routing_key=None,
                  durable=None, exchange_type=None, exchange_durable=None,
-                 queue=None, queue_durable=None, queue_exclusive = None,
-                 queue_arguments=None, auto_declare=None, auto_ack=None,
-                 marker=None):
+                 exchange_auto_delete=None, queue=None, queue_durable=None,
+                 queue_auto_delete=None, queue_exclusive=None,
+                 queue_arguments=None, auto_declare=None, auto_delete=None,
+                 auto_ack=None, marker=None):
 
         self._queue = None  # will default to self.queue
 
@@ -95,6 +99,12 @@ class Consumer(grok.GlobalUtility):
         if durable is not None:
             self.durable = durable
 
+        # auto_delete (and the default for exchange/queue_auto_delete)
+        if auto_delete is not None:
+            self.auto_delete = auto_delete
+        elif self.auto_delete is None:
+            self.auto_delete = not self.durable
+
         # exchange_type
         if exchange_type is not None:
             self.exchange_type = exchange_type
@@ -103,6 +113,11 @@ class Consumer(grok.GlobalUtility):
             self.exchange_durable = exchange_durable
         elif self.exchange_durable is None:
             self.exchange_durable = self.durable
+        # exchange_auto_delete
+        if exchange_auto_delete is not None:
+            self.exchange_auto_delete = exchange_auto_delete
+        elif self.exchange_auto_delete is None:
+            self.exchange_auto_delete = self.auto_delete
 
         # queue
         if self.queue is None and queue is None:
@@ -119,6 +134,11 @@ class Consumer(grok.GlobalUtility):
             self.queue_durable = queue_durable
         elif self.queue_durable is None:
             self.queue_durable = self.durable
+        # queue_auto_delete
+        if queue_auto_delete is not None:
+            self.queue_auto_delete = queue_auto_delete
+        elif self.queue_auto_delete is None:
+            self.queue_auto_delete = self.auto_delete
         # queue_exclusive
         if queue_exclusive is not None:
             self.queue_exclusive = queue_exclusive
@@ -165,7 +185,7 @@ class Consumer(grok.GlobalUtility):
         self._channel.exchange_declare(exchange=self.exchange,
                                        type=self.exchange_type,
                                        durable=self.exchange_durable,
-                                       auto_delete=not self.exchange_durable,
+                                       auto_delete=self.exchange_auto_delete,
                                        callback=self.on_exchange_declared)
 
     def on_exchange_declared(self, frame):
@@ -181,7 +201,7 @@ class Consumer(grok.GlobalUtility):
         self._channel.queue_declare(queue=self.queue,
                                     durable=self.queue_durable,
                                     exclusive=self.queue_exclusive,
-                                    auto_delete=not self.queue_durable,
+                                    auto_delete=self.queue_auto_delete,
                                     arguments=self.queue_arguments,
                                     callback=self.on_queue_declared)
 
@@ -232,7 +252,7 @@ class Consumer(grok.GlobalUtility):
             frame = channel.queue_declare(queue=self._queue,
                                           durable=self.queue_durable,
                                           exclusive=self.queue_exclusive,
-                                          auto_delete=not self.queue_durable,
+                                          auto_delete=self.queue_auto_delete,
                                           arguments=self.queue_arguments)
             return frame.method.message_count
 

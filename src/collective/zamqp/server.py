@@ -148,8 +148,8 @@ class ConsumingServer(object):
         # The following default __ac-cookie support works only for the default
         # Plone 4.x-setup, for authenticating messages between Plone-sites with
         # the same plone.session shared secret. It could also be used for
-        # authenticating web-stomp-origin requests, but in reality, there is
-        # now safe way to give the web-stomp-javascript access the value of the
+        # authenticating web-stomp-origin requests, but in reality, there is no
+        # safe way to give the web-stomp-javascript access the value of the
         # current __ac-cookie value.
         headers = getattr(message.header_frame, 'headers', {}) or {}
         x_cookie_auth = headers.get('x-cookie-auth', None)

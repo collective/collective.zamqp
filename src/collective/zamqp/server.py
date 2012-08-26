@@ -142,6 +142,15 @@ class ConsumingServer(object):
         env['AMQP_USER_ID'] = self.user_id
         zreq = AMQPRequest(out, env, resp)
 
+        # TODO: We may need some abstraction here to support custom PAS-plugins
+        # for authentication of AMQP-requests.
+        #
+        # The following default __ac-cookie support works only for the default
+        # Plone 4.x-setup, for authenticating messages between Plone-sites with
+        # the same plone.session shared secret. It could also be used for
+        # authenticating web-stomp-origin requests, but in reality, there is
+        # now safe way to give the web-stomp-javascript access the value of the
+        # current __ac-cookie value.
         headers = getattr(message.header_frame, 'headers', {}) or {}
         x_cookie_auth = headers.get('x-cookie-auth', None)
         if x_cookie_auth:

@@ -13,6 +13,7 @@
 """Consumer utility base class"""
 
 import sys
+import transaction
 
 import grokcore.component as grok
 
@@ -284,6 +285,10 @@ class security_manager:
     def __enter__(self):
         self.old_security_manager = getSecurityManager()
         if self.user:
+            # Annotate transaction with the proper user
+            T = transaction.get()
+            T.setUser(str(self.user),
+                      '/'.join(self.user.getPhysicalPath()[1:-1]))
             return newSecurityManager(self.request, self.user)
         else:
             return self.old_security_manager

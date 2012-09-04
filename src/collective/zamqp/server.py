@@ -102,7 +102,7 @@ class ConsumingServer(object):
 
         self.logger = LogHelper(logger)
         self.log_info(("AMQP Consuming Server for connection '%s' started "
-                       "(site '%s' user: '%s')")\
+                       "(site '%s' user: '%s')")
                       % (connection_id, site_id, user_id))
 
         if handler is None:
@@ -195,7 +195,7 @@ class ConsumingServer(object):
                 # consumer.
 
                 # Get the consumer configuration:
-                kwargs = consumerUtility.__dict__.copy() # instance properties
+                kwargs = consumerUtility.__dict__.copy()  # instance properties
                 kwargs = dict(k for k in kwargs.items() if k[1] is not None)
 
                 # Substitute ${site_id} to support site specific queues:

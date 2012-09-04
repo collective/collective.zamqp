@@ -84,15 +84,6 @@ class Producer(grok.GlobalUtility, VTM):
         assert self.exchange is not None,\
                u"Producer configuration is missing exchange."
 
-        # routing_key
-        if self.routing_key is None and routing_key is None:
-            routing_key =\
-                getattr(self, 'grokcore.component.directive.name', None)
-        if routing_key is not None:
-            self.routing_key = routing_key
-        assert self.routing_key is not None,\
-               u"Producer configuration is missing routing_key."
-
         # durable (and the default for exchange/queue_durable)
         if durable is not None:
             self.durable = durable
@@ -136,6 +127,20 @@ class Producer(grok.GlobalUtility, VTM):
         # queue_arguments
         if queue_arguments is not None:
             self.queue_arguments = queue_arguments
+
+        # routing_key
+        if self.routing_key is None and routing_key is None:
+            routing_key =\
+                getattr(self, 'grokcore.component.directive.name', None)
+        if routing_key is not None:
+            self.routing_key = routing_key
+        elif self.routing_key is None:
+            if self.queue is not None:
+                self.routing_key = self.queue
+            elif self.exchange_type == 'fanout':
+                self.routing_key = '*'
+        assert self.routing_key is not None,\
+               u"Producer configuration is missing routing_key."
 
         # auto_declare
         if auto_declare is not None:

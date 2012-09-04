@@ -286,9 +286,9 @@ class security_manager:
         self.old_security_manager = getSecurityManager()
         if self.user:
             # Annotate transaction with the proper user
-            T = transaction.get()
-            T.setUser(str(self.user),
-                      '/'.join(self.user.getPhysicalPath()[1:-1]))
+            txn = transaction.get()
+            txn.setUser(str(self.user),
+                        '/'.join(self.user.getPhysicalPath()[1:-1]))
             return newSecurityManager(self.request, self.user)
         else:
             return self.old_security_manager

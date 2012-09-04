@@ -23,7 +23,8 @@ from AccessControl.SecurityManagement import getSecurityManager
 
 from ZODB.POSException import ConflictError
 
-from zope.interface import alsoProvides
+from zope.interface import implements, alsoProvides
+from zope.publisher.interfaces import IPublishTraverse
 from zope.component import createObject, getUtility, queryUtility
 from zope.event import notify
 
@@ -299,6 +300,17 @@ class security_manager:
 
 
 class ConsumingView(BrowserView):
+    """Consumes AMQP-messages send by consuming server.
+    This view should be configured only for requests providing
+    IConsumingRequests and not be available for regular requests.
+    """
+
+    implements(IPublishTraverse)
+
+    def publishTraverse(self, request, name):
+        """Allows arbitrary traverse to give more descriptive undo logs"""
+        self.__name__ += '/%s' % name
+        return self
 
     def __call__(self):
         message = self.request.environ.get('AMQP_MESSAGE')

@@ -129,7 +129,21 @@ class ConsumingServer(object):
         logger.log(getattr(logging, type.upper(), 20), message)
 
     def get_requests_and_response(self, message):
-        method = '%s/@@zamqp-consumer' % self.site_id
+        # All ZAMQP-requests are send to the same 'zamqp-consumer'-view. To
+        # enhance the resulting transaction undo log, we append the view path
+        # with message related details so that the full undo log path will be
+        # @@zamqp-consumer/connection_id/exchange/routing_key[/correlation_id]
+        exchange = getattr(message.method_frame, 'exchange', '') or '(default)'
+        routing_key = getattr(message.method_frame, 'routing_key', '')
+        correlation_id = getattr(message.header_frame, 'correlation_id', '')
+        if correlation_id:
+            method = '%s/@@zamqp-consumer/%s/%s/%s/%s' % (
+                self.site_id,
+                self.connection_id, exchange, routing_key, correlation_id)
+        else:
+            method = '%s/@@zamqp-consumer/%s/%s/%s' % (
+                self.site_id,
+                self.connection_id, exchange, routing_key)
 
         out = StringIO.StringIO()
         s_req = '%s %s HTTP/%s' % ('GET', method, '1.0')

@@ -228,10 +228,11 @@ class Consumer(grok.GlobalUtility):
         self.on_ready_to_consume()
 
     def on_ready_to_consume(self):
-        logger.info("Consumer ready to consume queue '%s' on connection '%s'",
-                    self._queue, self.connection_id)
-        self._channel.basic_consume(self.on_message_received,
-                                    queue=self._queue)
+        if self.marker:
+            logger.info("Consumer ready to consume queue '%s' on "
+                        "connection '%s'", self._queue, self.connection_id)
+            self._channel.basic_consume(self.on_message_received,
+                                        queue=self._queue)
 
     def on_message_received(self, channel, method_frame, header_frame, body):
         message = createObject('AMQPMessage',

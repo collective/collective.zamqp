@@ -241,7 +241,7 @@ class Consumer(grok.GlobalUtility):
                                method_frame=method_frame,
                                channel=self._channel,
                                tx_select=self._tx_select)
-        if isinstance(self.marker, Interface):  # marker must be an interface
+        if self.marker:
             alsoProvides(message, self.marker)
 
         if self.auto_ack:

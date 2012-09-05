@@ -97,6 +97,7 @@ class PingConsumer(Consumer):
         return 'collective.zamqp.%s' % self.connection_id
 
     durable = False
+    marker = False  # allows consuming, but wouldn't stamp messages
 
     def on_message_received(self, channel, method_frame, header_frame, body):
         channel.basic_ack(delivery_tag=method_frame.delivery_tag)

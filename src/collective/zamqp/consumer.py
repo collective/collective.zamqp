@@ -23,7 +23,7 @@ from AccessControl.SecurityManagement import getSecurityManager
 
 from ZODB.POSException import ConflictError
 
-from zope.interface import implements, alsoProvides
+from zope.interface import Interface, implements, alsoProvides
 from zope.publisher.interfaces import IPublishTraverse
 from zope.component import createObject, getUtility, queryUtility
 from zope.event import notify
@@ -228,7 +228,7 @@ class Consumer(grok.GlobalUtility):
         self.on_ready_to_consume()
 
     def on_ready_to_consume(self):
-        if self.marker:
+        if self.marker is not None:  # False is allowed to trigger consuming
             logger.info("Consumer ready to consume queue '%s' on "
                         "connection '%s'", self._queue, self.connection_id)
             self._channel.basic_consume(self.on_message_received,
@@ -241,7 +241,7 @@ class Consumer(grok.GlobalUtility):
                                method_frame=method_frame,
                                channel=self._channel,
                                tx_select=self._tx_select)
-        if self.marker:
+        if isinstance(self.marker, Interface):  # marker must be an interface
             alsoProvides(message, self.marker)
 
         if self.auto_ack:

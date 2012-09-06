@@ -250,8 +250,8 @@ class Consumer(grok.GlobalUtility):
         self._message_received_callback(message)
 
     def __len__(self):
-        connection = getUtility(IBrokerConnection, name=self.connection_id)
-        with BlockingChannel(connection) as channel:
+        """Return message count of the consumed queue"""
+        with BlockingChannel(self.connection_id) as channel:
             frame = channel.queue_declare(queue=self._queue,
                                           durable=self.queue_durable,
                                           exclusive=self.queue_exclusive,

@@ -290,8 +290,8 @@ class Producer(grok.GlobalUtility, VTM):
         """Return message count of the target queue"""
         # XXX: Producer knows it target queue only, if it's explicitly
         # set in its definition. Otherwise self._queue is None
-        connection = getUtility(IBrokerConnection, name=self.connection_id)
-        with BlockingChannel(connection) as channel:
+        assert self._queue, "Sorry, producer doesn't know its target queue."
+        with BlockingChannel(self.connection_id) as channel:
             frame = channel.queue_declare(queue=self._queue,
                                           durable=self.queue_durable,
                                           exclusive=self.queue_exclusive,

@@ -1,6 +1,32 @@
 Changelog
 =========
 
+0.7.18 (2012-09-06)
+-------------------
+
+- Fixed consumers without marker interface not to start consuming.
+- Enhanced undolog for transactions by 'zamqp-consumer'-view.
+- Fixed consuming view to annotate transaction with the user configured for the
+  current consuming service.
+- Added separate auto_delete-setting for exchanges and queues. Previously
+  auto_delete was set as negation of durability, which remains the default.
+- Added connection configuration to default with implicit default producer
+  registration (= producer with the same name/id as the connection, but no any
+  special routing).
+- Added support for custom 'x-cookie-auth' header. Its value will be set to
+  value of '__ac' cookie for AMQP request to allow PAS-authentication for
+  logged in user (e.g. to support authenticated asyncronous tasks).
+- Added __len__ for consumer and producer for getting the queue length (if the
+  related queue is defined) using blocking channel.
+- Added BlockingChannel wrapper to be used with 'with' statement to create
+  separate blocking connections for quick raw AMQP-operations.
+- Fixed to never declare queue starting with 'amq.', which is reserved prefix
+  in RabbitMQ. Allow empty queue names to support automatic (broker-generated)
+  queue-names.
+- Fixed to never declare RabbitMQ default exchanges (declarig of any
+  'amq.'-starting exchange will be skipped).
+- Added json-serializer (when either json or simplejson can be imported).
+
 0.7.18 (2012-08-10)
 -------------------
 
@@ -10,7 +36,6 @@ Changelog
   layer. Enabled RabbitMQ-parts in test buildout.
 - Fixed consumers and producers to use the default exchange by default to allow
   the easiest possible configuration for the use of the default exchange only.
-
 
 0.7.17 (2012-05-21)
 -------------------
@@ -29,7 +54,6 @@ Changelog
 - Dropped 'magical' buildout name from keepalive's ping queues.
 - Removed 'magical' proxying of message body's properties before we rely on it.
 
-
 0.7.16 (2012-05-04)
 -------------------
 
@@ -37,31 +61,26 @@ Changelog
 - Changed default serializer from 'text/plain' to 'pickle'.
 - Fixed added dependencies to work on Plone 4.0.x.
 
-
 0.7.14 (2012-05-02)
 -------------------
 
 - Fixed to requeue message when transaction of successful handling is aborted
   (e.g. due to ZODB conflict error).
 
-
 0.7.12 (2012-04-25)
 -------------------
 
 - Added support for sauna.reload.
-
 
 0.7.11 (2012-04-18)
 -------------------
 
 - Changed ping to be logged on debug-level instead of info-level.
 
-
 0.7.10 (2012-04-18)
 -------------------
 
 - Fixed Pika-adapter to process timeouts to support AMQP-heartbeat.
-
 
 0.7.9 (2012-04-16)
 ------------------
@@ -69,31 +88,26 @@ Changelog
 - Modified keepalive-setting to accept an integer instead of boolean to
   allow configuration of keepalive-ping-interval in detail.
 
-
 0.7.8 (2012-04-16)
 ------------------
 
 - Fixed issue where a typo in message de-serialization hide de-serialized body.
-
 
 0.7.7 (2012-04-04)
 ------------------
 
 - Fixed issue with attribute not found in threadlocals.
 
-
 0.7.5 (2012-02-26)
 ------------------
 
 - Minor fixes for being more *sauna.reload*-friendly.
-
 
 0.7.4 (2012-03-12)
 ------------------
 
 - Simplified Ping-consumer to ack messages and log ping directly withing
   asyncore loop without creating a fake HTTP-request.
-
 
 0.7.3 (2012-03-09)
 ------------------
@@ -102,7 +116,6 @@ Changelog
   used in configuration re-usable packages using buildout-depending
   AMQP-queues (e.g. for replies).
 
-
 0.7.2 (2012-03-08)
 ------------------
 
@@ -110,13 +123,11 @@ Changelog
   zope.conf to auto-register all needed utilities, views and clock-servers for
   keeping the connection alive with regular ping message.
 
-
 0.7.1 (2012-03-06)
 ------------------
 
 - Allowed new named AMQP Broker Connections to be defined in zope.conf
   (or in 'zope-conf-additional' in instance buildout recipe).
-
 
 0.7.0 (2012-02-05)
 ------------------

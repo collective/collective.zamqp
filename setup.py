@@ -1,13 +1,13 @@
 from setuptools import setup, find_packages
 
-version = '0.7.18'
+version = '0.8.0'
 
 setup(
     name='collective.zamqp',
     version=version,
     description="AMQP consumer and producer integration for Zope2",
     long_description=open("README.rst").read() + "\n" +
-                     open("HISTORY.txt").read(),
+                     open("CHANGES.txt").read(),
     classifiers=[
         "Operating System :: OS Independent",
         "Intended Audience :: Developers",

@@ -1,8 +1,13 @@
 Changelog
 =========
 
-0.7.18 (2012-09-06)
--------------------
+0.8.1 (2012-09-06)
+------------------
+
+- Fixed queue length helpers to use BlockingChannel-helper properly.
+
+0.8.0 (2012-09-06)
+------------------
 
 - Fixed consumers without marker interface not to start consuming.
 - Enhanced undolog for transactions by 'zamqp-consumer'-view.

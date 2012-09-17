@@ -23,9 +23,9 @@ from AccessControl.SecurityManagement import getSecurityManager
 
 from ZODB.POSException import ConflictError
 
-from zope.interface import Interface, implements, alsoProvides
+from zope.interface import implements, alsoProvides
 from zope.publisher.interfaces import IPublishTraverse
-from zope.component import createObject, getUtility, queryUtility
+from zope.component import createObject, queryUtility
 from zope.event import notify
 
 try:
@@ -36,8 +36,7 @@ except ImportError:  # BBB
 
 from Products.Five.browser import BrowserView
 
-from collective.zamqp.interfaces import\
-    IBrokerConnection, IConsumer, IErrorHandler
+from collective.zamqp.interfaces import IConsumer, IErrorHandler
 from collective.zamqp.connection import BlockingChannel
 
 import logging

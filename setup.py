@@ -1,13 +1,11 @@
 from setuptools import setup, find_packages
 
-version = '0.8.1'
-
 setup(
     name='collective.zamqp',
-    version=version,
+    version='0.9.0',
     description="AMQP consumer and producer integration for Zope2",
-    long_description=open("README.rst").read() + "\n" +
-                     open("CHANGES.txt").read(),
+    long_description=(open("README.rst").read() + "\n" +
+                      open("CHANGES.txt").read()),
     classifiers=[
         "Operating System :: OS Independent",
         "Intended Audience :: Developers",
@@ -57,5 +55,5 @@ setup(
         'pika == 0.9.5',  # pika > 0.9.5 will require review and fixes
         'zope.deprecation',
         'z3c.unconfigure',  # only for sauna.reload-support
-        ]
-    )
+    ]
+)

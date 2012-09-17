@@ -241,6 +241,9 @@ class Producer(grok.GlobalUtility, VTM):
         else:
             return False
 
+    def register(self):
+        self._register()
+
     def publish(self, message, exchange=None, routing_key=None,
                 mandatory=False, immediate=False,
                 content_type=None, content_encoding=None,
@@ -336,7 +339,7 @@ class Producer(grok.GlobalUtility, VTM):
         if getattr(self._connection, "tx_select", False):
             self._tx_commit()  # minimal support for transactional channel
 
-    # Define thread-safe VTM._v_registered:
+    # Define threadlocal VTM._v_registered:
 
     def _get_v_registered(self):
         return getattr(self._threadlocal, "_v_registered", 0)
@@ -346,7 +349,7 @@ class Producer(grok.GlobalUtility, VTM):
 
     _v_registered = property(_get_v_registered, _set_v_registered)
 
-    # Define thread-safe VMT._v_finalize:
+    # Define threadlocal VTM._v_finalize:
 
     def _get_v_finalize(self):
         return getattr(self._threadlocal, "_v_finalize", 0)
@@ -356,7 +359,7 @@ class Producer(grok.GlobalUtility, VTM):
 
     _v_finalize = property(_get_v_finalize, _set_v_finalize)
 
-    # Define thread-safe self._pending_messages:
+    # Define threadlocal self._pending_messages:
 
     def _get_pending_messages(self):
         return getattr(self._threadlocal, "_pending_messages", None)

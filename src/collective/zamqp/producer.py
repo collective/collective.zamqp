@@ -76,13 +76,13 @@ class Producer(grok.GlobalUtility, VTM):
         if connection_id is not None:
             self.connection_id = connection_id
         assert self.connection_id is not None,\
-               u"Producer configuration is missing connection_id."
+            u"Producer configuration is missing connection_id."
 
         # exchange
         if exchange is not None:
             self.exchange = exchange
         assert self.exchange is not None,\
-               u"Producer configuration is missing exchange."
+            u"Producer configuration is missing exchange."
 
         # durable (and the default for exchange/queue_durable)
         if durable is not None:
@@ -140,7 +140,7 @@ class Producer(grok.GlobalUtility, VTM):
             elif self.exchange_type == 'fanout':
                 self.routing_key = '*'
         assert self.routing_key is not None,\
-               u"Producer configuration is missing routing_key."
+            u"Producer configuration is missing routing_key."
 
         # auto_declare
         if auto_declare is not None:
@@ -169,16 +169,16 @@ class Producer(grok.GlobalUtility, VTM):
         else:
             logger.warning(("Connection '%s' was not registered. "
                             "Producer '%s' cannot be connected."),
-                            self.connection_id, self.routing_key)
+                           self.connection_id, self.routing_key)
 
     def on_channel_open(self, channel):
         self._channel = channel
 
         if self.auto_declare and self.exchange\
-            and not self.exchange.startswith('amq.'):
+                and not self.exchange.startswith('amq.'):
             self.declare_exchange()
         elif self.auto_declare and self.queue is not None\
-            and not self.queue.startswith('amq.'):
+                and not self.queue.startswith('amq.'):
             self.declare_queue()
         else:
             self.on_ready_to_publish()
@@ -194,7 +194,7 @@ class Producer(grok.GlobalUtility, VTM):
         logger.info("Producer declared exchange '%s' on connection '%s'",
                     self.exchange, self.connection_id)
         if self.auto_declare and self.queue is not None\
-            and not self.queue.startswith('amq.'):
+                and not self.queue.startswith('amq.'):
             self.declare_queue()
         else:
             self.on_ready_to_publish()
@@ -236,7 +236,7 @@ class Producer(grok.GlobalUtility, VTM):
     @property
     def is_connected(self):
         if getattr(self._connection, "is_open", False)\
-            and getattr(self, '_channel', None):
+                and getattr(self, '_channel', None):
             return True
         else:
             return False
@@ -306,7 +306,7 @@ class Producer(grok.GlobalUtility, VTM):
         retry_constructor = lambda func, kwargs: lambda: func(**kwargs)
 
         if getattr(self._connection, "is_open", False)\
-            and getattr(self, '_channel', None):
+                and getattr(self, '_channel', None):
             self._channel.basic_publish(**kwargs)
             return True
 
@@ -322,7 +322,7 @@ class Producer(grok.GlobalUtility, VTM):
 
     def _tx_commit(self):
         if getattr(self._connection, "is_open", False)\
-            and getattr(self, '_channel', None):
+                and getattr(self, '_channel', None):
             self._channel.tx_commit()
         else:
             logger.warning('No connection. Tx.Commit could not be sent.')

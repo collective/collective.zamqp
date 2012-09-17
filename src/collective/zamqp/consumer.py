@@ -86,7 +86,7 @@ class Consumer(grok.GlobalUtility):
         if connection_id is not None:
             self.connection_id = connection_id
         assert self.connection_id is not None,\
-               u"Consumer configuration is missing connection_id."
+            u"Consumer configuration is missing connection_id."
 
         # exchange
         if exchange is not None:
@@ -126,7 +126,7 @@ class Consumer(grok.GlobalUtility):
         if queue is not None:
             self._queue = self.queue = queue
         assert self.queue is not None,\
-               u"Consumer configuration is missing queue."
+            u"Consumer configuration is missing queue."
         # routing_key
         if self.routing_key is None:
             self.routing_key = self.queue
@@ -174,10 +174,10 @@ class Consumer(grok.GlobalUtility):
         self._message_received_callback = on_message_received
 
         if self.auto_declare and self.exchange\
-            and not self.exchange.startswith('amq.'):
+                and not self.exchange.startswith('amq.'):
             self.declare_exchange()
         elif self.auto_declare and self.queue is not None\
-            and not self.queue.startswith('amq.'):
+                and not self.queue.startswith('amq.'):
             self.declare_queue()
         else:
             self.on_ready_to_consume()
@@ -193,7 +193,7 @@ class Consumer(grok.GlobalUtility):
         logger.info("Consumer declared exchange '%s' on connection '%s'",
                     self.exchange, self.connection_id)
         if self.auto_declare and self.queue is not None\
-            and not self.queue.startswith('amq.'):
+                and not self.queue.startswith('amq.'):
             self.declare_queue()
         else:
             self.on_ready_to_consume()

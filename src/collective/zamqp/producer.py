@@ -257,6 +257,9 @@ class Producer(grok.GlobalUtility, VTM):
         reply_to = reply_to or self.reply_to
         serializer = serializer or self.serializer
 
+        if correlation_id is not None:
+            correlation_id = str(correlation_id)
+
         if serializer and not content_type:
             util = getUtility(ISerializer, name=serializer)
             content_type = util.content_type
@@ -273,7 +276,7 @@ class Producer(grok.GlobalUtility, VTM):
         properties = BasicProperties(
             content_type=content_type, content_encoding=content_encoding,
             headers=headers, delivery_mode=delivery_mode, priority=priority,
-            correlation_id=str(correlation_id), reply_to=reply_to,
+            correlation_id=correlation_id, reply_to=reply_to,
             expiration=expiration, message_id=message_id, timestamp=timestamp,
             type=type, user_id=user_id, app_id=app_id, cluster_id=cluster_id)
 

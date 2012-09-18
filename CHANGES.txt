@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.9.1 (2012-09-18)
+------------------
+
+- Fixed to not set correlation_id-property for message if the given
+  correlation_id is None.
+
 0.9.0 (2012-09-17)
 ------------------
 
@@ -68,7 +74,7 @@ Changelog
 0.7.16 (2012-05-04)
 -------------------
 
-- Forced correlatio_id to be str.
+- Forced correlation_id to be str.
 - Changed default serializer from 'text/plain' to 'pickle'.
 - Fixed added dependencies to work on Plone 4.0.x.
 

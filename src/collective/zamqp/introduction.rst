@@ -26,8 +26,8 @@ Why is it worth of the effort?
 
 * You have more options on how to build integration between your services.
 
-* A separate broker server makes it easy to
-  `monitor what's happening with your services
+* A separate broker server gives you more options on
+  `monitoring what's happening with your services
   <http://www.youtube.com/watch?v=CAak2ayFcV0>`_.
 
 Using this package, your AMQP-setup could look like this:

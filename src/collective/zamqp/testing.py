@@ -75,7 +75,7 @@ class ZAMQP(Layer):
         # Set AMQP port from the RabbitFixture
         from zope.component import getUtility
         from collective.zamqp.interfaces import IBrokerConnection
-        connection = getUtility(IBrokerConnection, name="test.connection")
+        connection = getUtility(IBrokerConnection, name='test.connection')
         connection.port = self['rabbit'].config.port
 
         # Define dummy request handler to replace ZPublisher
@@ -91,14 +91,24 @@ class ZAMQP(Layer):
         self['zamqp'] = ConsumingServer(connection.connection_id, 'plone',
                                         handler=handler)
 
+ZAMQP_FIXTURE = ZAMQP()
+
+
+class ZAMQPConnectAll(Layer):
+    defaultBases = ()
+
+    def setUp(self):
         # Init connections
         from collective.zamqp import connection
         connection.connect_all()
 
 
-ZAMQP_FIXTURE = ZAMQP()
+ZAMQP_CONNECT_ALL_FIXTURE = ZAMQPConnectAll()
+
 
 ZAMQP_INTEGRATION_TESTING = z2.IntegrationTesting(
-    bases=(ZAMQP_FIXTURE,), name='ZAMQPFixture:Integration')
+    bases=(ZAMQP_FIXTURE, ZAMQP_CONNECT_ALL_FIXTURE),
+    name='ZAMQP:Integration')
 ZAMQP_FUNCTIONAL_TESTING = z2.FunctionalTesting(
-    bases=(ZAMQP_FIXTURE,), name='ZAMQPFixture:Functional')
+    bases=(ZAMQP_FIXTURE, ZAMQP_CONNECT_ALL_FIXTURE),
+    name='ZAMQP:Functional')

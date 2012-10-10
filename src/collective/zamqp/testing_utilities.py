@@ -13,17 +13,12 @@ from grokcore import component as grok
 from zope.interface import Interface
 
 from collective.zamqp.interfaces import IMessageArrivedEvent
-from collective.zamqp.connection import BrokerConnection
 from collective.zamqp.producer import Producer
 from collective.zamqp.consumer import Consumer
 
 
 class IMessage(Interface):
     """Message marker interface"""
-
-
-class TestConnection(BrokerConnection):
-    grok.name("test.connection")
 
 
 class SimpleProducer(Producer):

@@ -17,7 +17,7 @@ from plone.testing import Layer, z2
 from rabbitfixture.server import (
     RabbitServer,
     RabbitServerResources
-    )
+)
 
 
 def runAsyncTest(testMethod, timeout=100):
@@ -64,7 +64,7 @@ RABBIT_APP_FUNCTIONAL_TESTING = z2.FunctionalTesting(
     bases=(RABBIT_FIXTURE, z2.STARTUP), name='RabbitAppFixture:Functional')
 
 
-class ZAMQP(Layer):
+class Testing(Layer):
     defaultBases = (RABBIT_FIXTURE, z2.STARTUP)
 
     def setUp(self):
@@ -72,13 +72,16 @@ class ZAMQP(Layer):
         xmlconfig.file('testing.zcml', collective.zamqp,
                        context=self['configurationContext'])
 
-        # Set AMQP port from the RabbitFixture
-        from zope.component import getUtility
-        from collective.zamqp.interfaces import IBrokerConnection
-        connection = getUtility(IBrokerConnection, name='test.connection')
-        connection.port = self['rabbit'].config.port
+TESTING_FIXTURE = Testing()
+
+
+class ZAMQP(Layer):
+    defaultBases = (RABBIT_FIXTURE, z2.STARTUP)
+
+    def setUp(self):
 
         # Define dummy request handler to replace ZPublisher
+
         def handler(app, request, response):
             from zope.event import notify
             from zope.component import createObject
@@ -86,29 +89,56 @@ class ZAMQP(Layer):
             event = createObject('AMQPMessageArrivedEvent', message)
             notify(event)
 
-        # Register consuming server
+        # Create connections and consuming servers for registered
+        # producers and consumers
+
+        from zope.component import getSiteManager
+        from collective.zamqp.interfaces import (
+            IBrokerConnection,
+            IProducer,
+            IConsumer
+        )
+        from collective.zamqp.connection import BrokerConnection
         from collective.zamqp.server import ConsumingServer
-        self['zamqp'] = ConsumingServer(connection.connection_id, 'plone',
-                                        handler=handler)
 
-ZAMQP_FIXTURE = ZAMQP()
+        sm = getSiteManager()
 
+        connections = []
+        consuming_servers = []
 
-class ZAMQPConnectAll(Layer):
-    defaultBases = ()
+        for producer in sm.getAllUtilitiesRegisteredFor(IProducer):
+            if not producer.connection_id in connections:
+                connection = BrokerConnection(producer.connection_id,
+                                              port=self['rabbit'].config.port)
+                sm.registerUtility(connection, provided=IBrokerConnection,
+                                   name=connection.connection_id)
+                connections.append(connection.connection_id)
 
-    def setUp(self):
-        # Init connections
+        for consumer in sm.getAllUtilitiesRegisteredFor(IConsumer):
+            if not consumer.connection_id in connections:
+                connection = BrokerConnection(producer.connection_id,
+                                              port=self['rabbit'].config.port)
+                sm.registerUtility(connection, provided=IBrokerConnection,
+                                   name=connection.connection_id)
+                connections.append(connection.connection_id)
+
+            if not consumer.connection_id in consuming_servers:
+                ConsumingServer(consumer.connection_id, 'plone',
+                                handler=handler)
+                consuming_servers.append(connection.connection_id)
+
+        # Connect all connections
+
         from collective.zamqp import connection
         connection.connect_all()
 
 
-ZAMQP_CONNECT_ALL_FIXTURE = ZAMQPConnectAll()
+ZAMQP_FIXTURE = ZAMQP()
 
 
 ZAMQP_INTEGRATION_TESTING = z2.IntegrationTesting(
-    bases=(ZAMQP_FIXTURE, ZAMQP_CONNECT_ALL_FIXTURE),
+    bases=(TESTING_FIXTURE, ZAMQP_FIXTURE),
     name='ZAMQP:Integration')
 ZAMQP_FUNCTIONAL_TESTING = z2.FunctionalTesting(
-    bases=(ZAMQP_FIXTURE, ZAMQP_CONNECT_ALL_FIXTURE),
+    bases=(TESTING_FIXTURE, ZAMQP_FIXTURE),
     name='ZAMQP:Functional')

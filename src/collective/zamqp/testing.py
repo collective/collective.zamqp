@@ -8,6 +8,8 @@
 ###
 """Test fixtures"""
 
+import asyncore
+
 from zope.configuration import xmlconfig
 
 from plone.testing import Layer, z2
@@ -18,12 +20,22 @@ from rabbitfixture.server import (
     )
 
 
+def runAsyncTest(testMethod, timeout=100):
+    """ Helper method for running tests requiring asyncore loop """
+    try:
+        asyncore.loop(timeout=0.1, count=1)
+        return testMethod()
+    except AssertionError:
+        if timeout > 0:
+            return runAsyncTest(testMethod, timeout - 1)
+        else:
+            raise
+
+
 class FixedHostname(RabbitServerResources):
-    """Allocate the resources a RabbitMQ server needs with the explicitly
-    defined hostname.
-    (Does not query the hostname from a socket as the default implementation
-    does.)
-    """
+    """Allocate resources for RabbitMQ server with the explicitly defined
+    hostname. (Does not query the hostname from a socket as the default
+    implementation does.) """
 
     @property
     def fq_nodename(self):
@@ -60,16 +72,28 @@ class ZAMQP(Layer):
         xmlconfig.file('testing.zcml', collective.zamqp,
                        context=self['configurationContext'])
 
+        # Set AMQP port from the RabbitFixture
         from zope.component import getUtility
         from collective.zamqp.interfaces import IBrokerConnection
         connection = getUtility(IBrokerConnection, name="test.connection")
         connection.port = self['rabbit'].config.port
 
-        # from collective.zamqp import connection
-        # connection.connect_all()
+        # Define dummy request handler to replace ZPublisher
+        def handler(app, request, response):
+            from zope.event import notify
+            from zope.component import createObject
+            message = request.environ.get('AMQP_MESSAGE')
+            event = createObject('AMQPMessageArrivedEvent', message)
+            notify(event)
 
-    def tearDown(self):
-        pass
+        # Register consuming server
+        from collective.zamqp.server import ConsumingServer
+        self['zamqp'] = ConsumingServer(connection.connection_id, 'plone',
+                                        handler=handler)
+
+        # Init connections
+        from collective.zamqp import connection
+        connection.connect_all()
 
 
 ZAMQP_FIXTURE = ZAMQP()

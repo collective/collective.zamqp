@@ -1,7 +1,14 @@
 collective.zamqp
 ================
 
-*AMQP consumer and producer integration for Zope2 (and Plone)*
+*Asynchronous AMQP-integration for Plone (and Zope2)*
+
+**collective.zamqp** enables asynchronous integrations between Plone and other
+systems, makes it possible to avoid ZODB conflicts on serializing write
+operations and allows to spawn queued asynchronous tasks from synchronous
+ZPublisher-requests. **collective.zamqp** is a developer friendly
+AMQP-integration for Plone. It requires an external AMQP-broker, preferably
+`RabbitMQ <http://www.rabbitmq.com>`_.
 
 .. uml::
 
@@ -26,18 +33,18 @@ collective.zamqp
    Service2 .up.> Broker
 
 **collective.zamqp** acts as a *Zope Server* by co-opting Zope's asyncore
-mainloop (using asyncore-supporting AMQP-library
-`pika <http://pypi.python.org/pypi/pika>`_),
-and injecting consumed messages as *requests* to be handled by ZPublisher
-(exactly like Zope ClockServer).
+mainloop and injecting consumed messages as *requests* to be handled by
+ZPublisher (exactly like Zope ClockServer). Therefore AMQP-messages are handled
+(by default) in a similar environment to regular HTTP-requests: ZCA-hooks,
+events and everything else behaving normally.
 
-Therefore AMQP-messages are handled (by default) in a similar environment to
-regular HTTP-requests: ZCA-hooks, events and everything else behaving normally.
+**collective.zamqp** is an almost complete rewrite of affinitic.zamqp
+<http://pypi.python.org/pypi/affinitic.zamqp>`_, but preserves its ideas on how
+to setup AMQP-routing with simple grok-based configuration of connections,
+producers and consumers.
 
-This package is an almost complete rewrite of
-`affinitic.zamqp <http://pypi.python.org/pypi/affinitic.zamqp>`_,
-but preserves its ideas on how to setup AMQP-messaging
-by configuring only producers and consumers.
+*collective.zamqp* relies on asyncore-supporting AMQP-library `pika
+<http://pypi.python.org/pypi/pika>`_.
 
 .. toctree::
    :maxdepth: 3
@@ -46,4 +53,4 @@ by configuring only producers and consumers.
 
 While we are still documenting and testing **collective.zamqp**,
 you may want to take a look at `collective.zamqpdemo
-<http://github.com/datakurre/collective.zamqpdemo/>`_ for an example of use.
+<http://github.com/datakurre/collective.zamqpdemo/>`_ for examples.

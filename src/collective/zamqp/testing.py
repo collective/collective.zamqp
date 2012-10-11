@@ -22,14 +22,16 @@ from rabbitfixture.server import (
 
 def runAsyncTest(testMethod, timeout=100):
     """ Helper method for running tests requiring asyncore loop """
-    try:
-        asyncore.loop(timeout=0.1, count=1)
-        return testMethod()
-    except AssertionError:
-        if timeout > 0:
-            return runAsyncTest(testMethod, timeout - 1)
-        else:
-            raise
+    while True:
+        try:
+            asyncore.loop(timeout=0.1, count=1)
+            return testMethod()
+        except AssertionError:
+            if timeout > 0:
+                timeout -= 1
+                continue
+            else:
+                raise
 
 
 class FixedHostname(RabbitServerResources):

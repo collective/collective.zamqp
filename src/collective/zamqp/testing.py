@@ -55,6 +55,11 @@ class Rabbit(Layer):
         # define a shortcut to rabbitmqctl
         self['rabbitctl'] = self['rabbit'].runner.environment.rabbitctl
 
+    def testTearDown(self):
+        self['rabbitctl']('stop_app')
+        self['rabbitctl']('reset')
+        self['rabbitctl']('start_app')
+
     def tearDown(self):
         self['rabbit'].cleanUp()
 
@@ -148,6 +153,12 @@ class ZAMQP(Layer):
         from collective.zamqp import connection
         connection.connect_all()
 
+    # def testTearDown(self):
+    #     from zope.component import getUtilitiesFor
+    #     from collective.zamqp.interfaces import IBrokerConnection
+    #     for connection_id, connection in getUtilitiesFor(IBrokerConnection):
+    #         if connection.is_open:
+    #             connection._channel.close()
 
 ZAMQP_FIXTURE = ZAMQP()
 

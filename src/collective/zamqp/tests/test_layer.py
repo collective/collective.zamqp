@@ -50,6 +50,8 @@ class ZAMQPFunctional(unittest.TestCase):
         self.assertIn("my.queue\t0", rabbitctl('list_queues')[0].split("\n"))
 
     def testPublishToQueueAndConsumeIt(self):
+        runAsyncTest(self._testDeclareQueue)
+
         from zope.component import getUtility
         from collective.zamqp.interfaces import IProducer
         producer = getUtility(IProducer, name="my.queue")

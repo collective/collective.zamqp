@@ -85,6 +85,7 @@ class ZAMQP(Layer):
         self.zserver = zserver
 
     def setUp(self):
+
         # Define dummy request handler to replace ZPublisher
 
         def handler(app, request, response):
@@ -93,6 +94,12 @@ class ZAMQP(Layer):
             message = request.environ.get('AMQP_MESSAGE')
             event = createObject('AMQPMessageArrivedEvent', message)
             notify(event)
+
+        # Define ZPublisher-based request handler to be used with zserver
+
+        def zserver_handler(app, request, response):
+            from ZPublisher import publish_module
+            publish_module(app, request=request, response=response)
 
         # Create connections and consuming servers for registered
         # producers and consumers
@@ -129,7 +136,8 @@ class ZAMQP(Layer):
 
             if not consumer.connection_id in consuming_servers:
                 if self.zserver:
-                    ConsumingServer(consumer.connection_id, 'plone')
+                    ConsumingServer(consumer.connection_id, 'plone',
+                                    handler=zserver_handler)
                 else:
                     ConsumingServer(consumer.connection_id, 'plone',
                                     handler=handler)

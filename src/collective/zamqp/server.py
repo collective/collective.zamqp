@@ -92,7 +92,7 @@ class ConsumingServer(object):
     # required by ZServer
     SERVER_IDENT = 'AMQP'
 
-    def __init__(self, connection_id, site_id, user_id=None,
+    def __init__(self, connection_id, site_id, user_id='Anonymous User',
                  logger=None, handler=None):
 
         h = self.headers = []

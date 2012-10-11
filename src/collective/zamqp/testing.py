@@ -80,8 +80,11 @@ TESTING_FIXTURE = Testing()
 class ZAMQP(Layer):
     defaultBases = (RABBIT_FIXTURE, z2.STARTUP)
 
-    def setUp(self):
+    def __init__(self, zserver=False):
+        super(ZAMQP, self).__init__()
+        self.zserver = zserver
 
+    def setUp(self):
         # Define dummy request handler to replace ZPublisher
 
         def handler(app, request, response):
@@ -125,8 +128,11 @@ class ZAMQP(Layer):
                 connections.append(connection.connection_id)
 
             if not consumer.connection_id in consuming_servers:
-                ConsumingServer(consumer.connection_id, 'plone',
-                                handler=handler)
+                if self.zserver:
+                    ConsumingServer(consumer.connection_id, 'plone')
+                else:
+                    ConsumingServer(consumer.connection_id, 'plone',
+                                    handler=handler)
                 consuming_servers.append(connection.connection_id)
 
         # Connect all connections
@@ -136,6 +142,8 @@ class ZAMQP(Layer):
 
 
 ZAMQP_FIXTURE = ZAMQP()
+
+ZAMQP_ZSERVER_FIXTURE = ZAMQP(zserver=True)
 
 
 ZAMQP_INTEGRATION_TESTING = z2.IntegrationTesting(

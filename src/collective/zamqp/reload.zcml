@@ -1,22 +1,26 @@
-<configure xmlns="http://namespaces.zope.org/zope">
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:zcml="http://namespaces.zope.org/zcml">
 
-    <include package="z3c.unconfigure" file="meta.zcml" />
+    <configure zcml:condition="installed z3c.unconfigure">
 
-    <unconfigure>
-      <subscriber
-          for="zope.processlifetime.IProcessStarting"
-          handler=".connection.connect_all"
-          />
-    </unconfigure>
+        <include package="z3c.unconfigure" file="meta.zcml" />
 
-    <subscriber
-        for="sauna.reload.interfaces.INewChildIsReady"
-        handler=".reload.connect_all_with_reload"
-        />
+        <unconfigure>
+          <subscriber
+              for="zope.processlifetime.IProcessStarting"
+              handler=".connection.connect_all"
+              />
+        </unconfigure>
 
-    <subscriber
-        for="zope.processlifetime.IProcessStarting"
-        handler=".reload.connect_all_without_reload"
-        />
+        <subscriber
+            for="sauna.reload.interfaces.INewChildIsReady"
+            handler=".reload.connect_all_with_reload"
+            />
+
+        <subscriber
+            for="zope.processlifetime.IProcessStarting"
+            handler=".reload.connect_all_without_reload"
+            />
+    </configure>
 
 </configure>

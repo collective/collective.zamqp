@@ -33,6 +33,9 @@ setup(
             'zope.configuration',
             'msgpack-python',
         ],
+        'reload': [
+            'z3c.unconfigure==1.0.1',  # required for full sauna.reload-support
+        ],
         'docs': [
             'sphinx',
             'collective.sphinx.includedoc',
@@ -54,6 +57,6 @@ setup(
         'grokcore.component',
         'pika == 0.9.5',  # pika > 0.9.5 will require review and fixes
         'zope.deprecation',
-        'z3c.unconfigure',  # only for sauna.reload-support
+        'z3c.unconfigure==1.0.1',  # BBB (for sauna.reload)
     ]
 )

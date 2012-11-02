@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.9.2 (2012-09-18)
+------------------
+
+- Pinned z3c.unconfigure==1.0.1.
+- Added test fixture to be used with ZSERVER-fixtures to support Selenium-testing.
+- Fixed consuming server to default to 'Anonymous User' instead of None.
+- Added runAsyncTest-helper for running tests depending on the asyncore loop.
+  Added consuming server for ZAMQP-layer.
+
 0.9.1 (2012-09-18)
 ------------------
 

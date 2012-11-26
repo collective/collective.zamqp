@@ -81,10 +81,10 @@ except ImportError:
 
 try:
     try:
-        import simplejson as json
+        import json
         json  # pyflakes
     except ImportError:
-        import json
+        import simplejson as json
 
     class JSONSerializer(grok.GlobalUtility):
         grok.provides(ISerializer)

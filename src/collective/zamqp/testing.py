@@ -20,11 +20,11 @@ from rabbitfixture.server import (
 )
 
 
-def runAsyncTest(testMethod, timeout=100):
+def runAsyncTest(testMethod, timeout=100, loop_timeout=0.1, loop_count=1):
     """ Helper method for running tests requiring asyncore loop """
     while True:
         try:
-            asyncore.loop(timeout=0.1, count=1)
+            asyncore.loop(timeout=loop_timeout, count=loop_count)
             return testMethod()
         except AssertionError:
             if timeout > 0:

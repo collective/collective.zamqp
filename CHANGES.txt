@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.9.4 (2012-11-27)
+------------------
+
+- Fixed bugs in registering connections and consuming servers in ZAMQP layer.
+
 - Added 'text/csv' serializer (for serializing iterable container of
   dictionaries into RFC4180 CSV data and deserializing such messages into
   tuple of dictionaries)

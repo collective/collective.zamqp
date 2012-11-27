@@ -133,7 +133,7 @@ class ZAMQP(Layer):
 
         for consumer in sm.getAllUtilitiesRegisteredFor(IConsumer):
             if not consumer.connection_id in connections:
-                connection = BrokerConnection(producer.connection_id,
+                connection = BrokerConnection(consumer.connection_id,
                                               port=self['rabbit'].config.port)
                 sm.registerUtility(connection, provided=IBrokerConnection,
                                    name=connection.connection_id)
@@ -146,7 +146,7 @@ class ZAMQP(Layer):
                 else:
                     ConsumingServer(consumer.connection_id, 'plone',
                                     handler=handler)
-                consuming_servers.append(connection.connection_id)
+                consuming_servers.append(consumer.connection_id)
 
         # Connect all connections
 

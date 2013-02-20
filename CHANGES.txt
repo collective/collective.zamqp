@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.9.5 (unreleased)
+0.9.5 (2013-02-20)
 ------------------
 
 - Fix to include convenient default producers in the default test layer

@@ -117,6 +117,7 @@ class ZAMQP(Layer):
         )
         from collective.zamqp.connection import BrokerConnection
         from collective.zamqp.server import ConsumingServer
+        from collective.zamqp.producer import Producer
 
         sm = getSiteManager()
 
@@ -131,6 +132,13 @@ class ZAMQP(Layer):
                                    name=connection.connection_id)
                 connections.append(connection.connection_id)
 
+                # generate default producer with the name of the connection
+                producer = Producer(connection.connection_id, exchange="",
+                                    routing_key="", durable=False,
+                                    auto_declare=False)
+                sm.registerUtility(producer, provided=IProducer,
+                                   name=connection.connection_id)
+
         for consumer in sm.getAllUtilitiesRegisteredFor(IConsumer):
             if not consumer.connection_id in connections:
                 connection = BrokerConnection(consumer.connection_id,
@@ -138,6 +146,13 @@ class ZAMQP(Layer):
                 sm.registerUtility(connection, provided=IBrokerConnection,
                                    name=connection.connection_id)
                 connections.append(connection.connection_id)
+
+                # generate default producer with the name of the connection
+                producer = Producer(connection.connection_id, exchange="",
+                                    routing_key="", durable=False,
+                                    auto_declare=False)
+                sm.registerUtility(producer, provided=IProducer,
+                                   name=connection.connection_id)
 
             if not consumer.connection_id in consuming_servers:
                 if self.zserver:

@@ -61,7 +61,14 @@ class Rabbit(Layer):
         self['rabbitctl']('start_app')
 
     def tearDown(self):
-        self['rabbit'].cleanUp()
+        try:
+            self['rabbit'].cleanUp()
+        except OSError as e:
+            if e.errno == 3:  # [Errno 3] No such process
+                # Rabbit may have already died because of KeyboardInterrupt
+                pass
+            else:
+                raise
 
 RABBIT_FIXTURE = Rabbit()
 

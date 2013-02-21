@@ -4,8 +4,7 @@ Changelog
 0.9.6 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Fix Rabbit-fixture to be silent when Rabbit has been killed before teardown
 
 0.9.5 (2013-02-20)
 ------------------

@@ -210,21 +210,35 @@ class Consumer(grok.GlobalUtility):
         self._queue = frame.method.queue  # get the real queue name
         logger.info("Consumer declared queue '%s' on connection '%s'",
                     self._queue, self.connection_id)
-        if self.auto_declare and self.exchange:
+        if self.auto_declare and self.exchange and self.routing_key:
             self.bind_queue()
         else:
             self.on_ready_to_consume()
 
     def bind_queue(self):
-        self._channel.queue_bind(exchange=self.exchange, queue=self._queue,
-                                 routing_key=self.routing_key,
-                                 callback=self.on_queue_bound)
+        if type(self.routing_key) not in (tuple, list):
+            self._channel.queue_bind(exchange=self.exchange, queue=self._queue,
+                                     routing_key=self.routing_key,
+                                     callback=self.on_queue_bound)
+        else:
+            self._channel.queue_bind(exchange=self.exchange, queue=self._queue,
+                                     routing_key=self.routing_key[0],
+                                     callback=self.on_queue_bound)
 
-    def on_queue_bound(self, frame):
+    def on_queue_bound(self, frame, index=0):
         logger.info(("Consumer bound queue '%s' to exchange '%s' "
                      "on connection '%s'"),
                     self._queue, self.exchange, self.connection_id)
-        self.on_ready_to_consume()
+        if type(self.routing_key) not in (tuple, list):
+            self.on_ready_to_consume()
+        elif len(self.routing_key) <= index + 1:
+            self.on_ready_to_consume()
+        else:
+            index = index + 1
+            cb = lambda f, s=self, index=index: self.on_queue_bound(f, index)
+            self._channel.queue_bind(exchange=self.exchange, queue=self._queue,
+                                     routing_key=self.routing_key[index],
+                                     callback=cb)
 
     def on_ready_to_consume(self):
         if self.marker is not None:  # False is allowed to trigger consuming

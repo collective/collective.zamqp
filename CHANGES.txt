@@ -1,11 +1,13 @@
 Changelog
 =========
 
-n (unreleased)
---------------
+0.9.7 (2013-03-05)
+------------------
 
-- Nothing changed yet.
-
+- Fix to not try to requeue auto-acknowledged messages on conflict errors,
+  because it's not possible
+- Fix consumer configuration to support list of routing keys (to ease the use
+  of metronome like exchanges)
 
 0.9.6 (2013-02-21)
 ------------------

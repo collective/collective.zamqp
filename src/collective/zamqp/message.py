@@ -144,9 +144,19 @@ class Message(object, VTM):
                     self.method_frame.delivery_tag, self.state)
 
     def _abort(self):
+        # collect execution info for guessing the reason for abort
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+
         if self.state != 'ACK':
             self.acknowledged = False
-        if self.state not in ('FAILED', 'REQUEUED'):
+        if self.state == 'ACK' and exc_type == ConflictError:
+            if not getattr(self, '_aborted', False):
+                logger.info("Transaction aborted due to database conflict. "
+                            "Message '%s' was acked before commit and could "
+                            "not be requeued (status = '%s')",
+                            self.method_frame.delivery_tag, self.state)
+                self._aborted = True
+        elif self.state not in ('FAILED', 'REQUEUED'):
             # on transactional channel, rollback on abort
             if self.channel and self.tx_select:
                 self.channel.tx_rollback()  # min support for transactional
@@ -156,9 +166,7 @@ class Message(object, VTM):
                 # only to make single-threaded AMQP-consuming ZEO-clients
                 # support transactional channel. DO NOT run multi-threaded
                 # consuming-server with transactional channel.
-
             # reject messages with requeue when ConflictError in ZPublisher
-            exc_type, exc_value, exc_traceback = sys.exc_info()
             if self.state != 'ERROR' and exc_type == ConflictError:
                 # reject message with requeue
                 self.channel.basic_reject(

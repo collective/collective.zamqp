@@ -1,11 +1,10 @@
 Changelog
 =========
 
-0.9.8 (unreleased)
+0.9.8 (2013-03-09)
 ------------------
 
-- Nothing changed yet.
-
+- Fix regression: allow to bind queue with empty routing key
 
 0.9.7 (2013-03-05)
 ------------------

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='collective.zamqp',
-    version='0.9.8',
+    version='0.9.9.dev0',
     description="Asynchronous AMQP-integration for Plone (and Zope2)",
     long_description=(open("README.rst").read() + "\n" +
                       open("CHANGES.txt").read()),

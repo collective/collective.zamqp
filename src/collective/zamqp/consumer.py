@@ -210,7 +210,7 @@ class Consumer(grok.GlobalUtility):
         self._queue = frame.method.queue  # get the real queue name
         logger.info("Consumer declared queue '%s' on connection '%s'",
                     self._queue, self.connection_id)
-        if self.auto_declare and self.exchange and self.routing_key:
+        if self.auto_declare and self.exchange:
             self.bind_queue()
         else:
             self.on_ready_to_consume()

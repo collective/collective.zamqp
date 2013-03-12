@@ -80,6 +80,10 @@ class PingProducer(Producer):
     def queue(self):
         return 'collective.zamqp.%s' % self.connection_id
 
+    queue_arguments = {
+        'x-message-ttl': 3600000,  # 60 * 60s = 1 minute
+    }
+
     serializer = 'text/plain'
     durable = False
 
@@ -95,6 +99,10 @@ class PingConsumer(Consumer):
     @property
     def queue(self):
         return 'collective.zamqp.%s' % self.connection_id
+
+    queue_arguments = {
+        'x-message-ttl': 3600000,  # 60 * 60s = 1 minute
+    }
 
     durable = False
     marker = False  # allows consuming, but wouldn't stamp messages

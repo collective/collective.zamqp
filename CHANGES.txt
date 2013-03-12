@@ -1,11 +1,12 @@
 Changelog
 =========
 
-0.9.9 (unreleased)
-------------------
+0.10.0 (2013-03-12)
+-------------------
 
-- Nothing changed yet.
-
+- Update keepalive-ping-queue to use 1 hour message ttl
+- Add option (defaulting to true) for monkey patching Zope2 lifetime_loop for
+  shorter asyncore.poll-timeouts on consuming instances.
 
 0.9.8 (2013-03-09)
 ------------------

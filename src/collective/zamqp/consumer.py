@@ -58,12 +58,14 @@ class Consumer(grok.GlobalUtility):
     exchange_type = 'direct'
     exchange_durable = None
     exchange_auto_delete = None
+    exchange_auto_declare = None
 
     queue = None
     queue_durable = None
     queue_auto_delete = None
     queue_exclusive = False
     queue_arguments = {}
+    queue_auto_declare = None
 
     auto_declare = True
     auto_delete = None
@@ -73,9 +75,10 @@ class Consumer(grok.GlobalUtility):
 
     def __init__(self, connection_id=None, exchange=None, routing_key=None,
                  durable=None, exchange_type=None, exchange_durable=None,
-                 exchange_auto_delete=None, queue=None, queue_durable=None,
-                 queue_auto_delete=None, queue_exclusive=None,
-                 queue_arguments=None, auto_declare=None, auto_delete=None,
+                 exchange_auto_delete=None, exchange_auto_declare=None,
+                 queue=None, queue_durable=None, queue_auto_delete=None,
+                 queue_exclusive=None, queue_arguments=None,
+                 queue_auto_declare=None, auto_declare=None, auto_delete=None,
                  auto_ack=None, marker=None):
 
         self._queue = None  # will default to self.queue
@@ -143,6 +146,9 @@ class Consumer(grok.GlobalUtility):
         # queue_exclusive
         if queue_exclusive is not None:
             self.queue_exclusive = queue_exclusive
+        if self.queue_exclusive is True:
+            self.queue_durable = False
+            self.queue_auto_delete = True
         # queue_arguments
         if queue_arguments is not None:
             self.queue_arguments = queue_arguments
@@ -150,6 +156,14 @@ class Consumer(grok.GlobalUtility):
         # auto_declare
         if auto_declare is not None:
             self.auto_declare = auto_declare
+        if exchange_auto_declare is not None:
+            self.exchange_auto_declare = exchange_auto_declare
+        elif self.exchange_auto_declare is None:
+            self.exchange_auto_declare = self.auto_declare
+        if queue_auto_declare is not None:
+            self.queue_auto_declare = queue_auto_declare
+        elif self.queue_auto_declare is None:
+            self.queue_auto_declare = self.auto_declare
 
         # auto_ack
         if auto_ack is not None:
@@ -173,10 +187,10 @@ class Consumer(grok.GlobalUtility):
         self._tx_select = tx_select
         self._message_received_callback = on_message_received
 
-        if self.auto_declare and self.exchange\
+        if self.exchange_auto_declare and self.exchange\
                 and not self.exchange.startswith('amq.'):
             self.declare_exchange()
-        elif self.auto_declare and self.queue is not None\
+        elif self.queue_auto_declare and self.queue is not None\
                 and not self.queue.startswith('amq.'):
             self.declare_queue()
         else:
@@ -192,7 +206,7 @@ class Consumer(grok.GlobalUtility):
     def on_exchange_declared(self, frame):
         logger.info("Consumer declared exchange '%s' on connection '%s'",
                     self.exchange, self.connection_id)
-        if self.auto_declare and self.queue is not None\
+        if self.queue_auto_declare and self.queue is not None\
                 and not self.queue.startswith('amq.'):
             self.declare_queue()
         else:

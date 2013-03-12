@@ -45,12 +45,14 @@ class Producer(grok.GlobalUtility, VTM):
     exchange_type = 'direct'
     exchange_durable = None
     exchange_auto_delete = None
+    exchange_auto_declare = None
 
     queue = None
     queue_durable = None
     queue_auto_delete = None
     queue_exclusive = False
     queue_arguments = {}
+    queue_auto_declare = None
 
     auto_declare = True
     auto_delete = None
@@ -60,9 +62,10 @@ class Producer(grok.GlobalUtility, VTM):
 
     def __init__(self, connection_id=None, exchange=None, routing_key=None,
                  durable=None, exchange_type=None, exchange_durable=None,
-                 exchange_auto_delete=None, queue=None, queue_durable=None,
-                 queue_auto_delete=None, queue_exclusive=None,
-                 queue_arguments=None, auto_declare=None, auto_delete=None,
+                 exchange_auto_delete=None, exchange_auto_declare=None,
+                 queue=None, queue_durable=None, queue_auto_delete=None,
+                 queue_exclusive=None, queue_arguments=None,
+                 queue_auto_declare=None, auto_declare=None, auto_delete=None,
                  reply_to=None, serializer=None):
 
         self._connection = None
@@ -124,6 +127,9 @@ class Producer(grok.GlobalUtility, VTM):
         # queue_exclusive
         if queue_exclusive is not None:
             self.queue_exclusive = queue_exclusive
+        if self.queue_exclusive is True:
+            self.queue_durable = False
+            self.queue_auto_delete = True
         # queue_arguments
         if queue_arguments is not None:
             self.queue_arguments = queue_arguments
@@ -145,6 +151,14 @@ class Producer(grok.GlobalUtility, VTM):
         # auto_declare
         if auto_declare is not None:
             self.auto_declare = auto_declare
+        if exchange_auto_declare is not None:
+            self.exchange_auto_declare = exchange_auto_declare
+        elif self.exchange_auto_declare is None:
+            self.exchange_auto_declare = self.auto_declare
+        if queue_auto_declare is not None:
+            self.queue_auto_declare = queue_auto_declare
+        elif self.queue_auto_declare is None:
+            self.queue_auto_declare = self.auto_declare
 
         # reply_to
         if reply_to is not None:
@@ -174,10 +188,10 @@ class Producer(grok.GlobalUtility, VTM):
     def on_channel_open(self, channel):
         self._channel = channel
 
-        if self.auto_declare and self.exchange\
+        if self.exchange_auto_declare and self.exchange\
                 and not self.exchange.startswith('amq.'):
             self.declare_exchange()
-        elif self.auto_declare and self.queue is not None\
+        elif self.queue_auto_declare and self.queue is not None\
                 and not self.queue.startswith('amq.'):
             self.declare_queue()
         else:
@@ -193,7 +207,7 @@ class Producer(grok.GlobalUtility, VTM):
     def on_exchange_declared(self, frame):
         logger.info("Producer declared exchange '%s' on connection '%s'",
                     self.exchange, self.connection_id)
-        if self.auto_declare and self.queue is not None\
+        if self.queue_auto_declare and self.queue is not None\
                 and not self.queue.startswith('amq.'):
             self.declare_queue()
         else:

@@ -1,11 +1,13 @@
 Changelog
 =========
 
-0.10.1 (unreleased)
+0.10.1 (2013-03-13)
 -------------------
 
-- Nothing changed yet.
-
+- Add configuration options for 'exchange_auto_declare' and
+  'queue_auto_declare'
+- Fix 'queue_exclusive = True' to imply also 'queue_durable = False' and
+  'queue_auto_delete = True'
 
 0.10.0 (2013-03-12)
 -------------------

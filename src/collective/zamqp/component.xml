@@ -80,5 +80,12 @@
        calling trusted filesystem code.
        </description>
      </key>
+     <key name="override_lifetime_loop" datatype="boolean" default="on">
+       <description>
+       Override Zope2's default lifetime_loop with 30 sec timeout is
+       problematic for AMQP connections. When enabled, that loop is
+       overridden with one with 1 s timeout.
+       </description>
+     </key>
   </sectiontype>
 </component>

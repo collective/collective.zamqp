@@ -8,6 +8,9 @@
 ###
 """ZConfig datatype support for AMQP Consuming Server"""
 
+import asyncore
+import Lifetime
+
 
 class BrokerConnectionFactory(object):
 
@@ -109,6 +112,14 @@ class BrokerConnectionFactory(object):
         return connection
 
 
+def lifetime_loop():
+    # The main loop. Stay in here until we need to shutdown
+    map = asyncore.socket_map
+    timeout = 1.0
+    while map and Lifetime._shutdown_phase == 0:
+        asyncore.poll(timeout, map)
+
+
 class ConsumingServerFactory(object):
 
     def __init__(self, section):
@@ -118,6 +129,9 @@ class ConsumingServerFactory(object):
 
         # Just in case, mimic ZServer.datatypes.ServerFactory
         self.ip = self.host = self.port = None
+
+        if section.override_lifetime_loop:
+            Lifetime.lifetime_loop = lifetime_loop  # override lifetime_loop
 
     def prepare(self, defaulthost='', dnsresolver=None,
                 module=None, env=None, portbase=None):

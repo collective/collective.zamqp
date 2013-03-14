@@ -125,13 +125,11 @@ class LockingSimpleBuffer(SimpleBuffer):
 class AsyncoreDispatcher(AsyncoreDispatcherBase):
     __doc__ = AsyncoreDispatcherBase.__doc__
 
-    # Patched asyncore dispatcher for Pika to activate
-    # Pika's support for AMQP heartbeat within Zope's
-    # asyncore based lifetime loop.
-
-    def handle_read(self):
-        AsyncoreDispatcherBase.handle_read(self)
+    # Patch asyncore dispatcher for Pika to activate Pika's support for AMQP
+    # heartbeat within Zope's asyncore based lifetime loop:
+    def readable(self):
         self._process_timeouts()
+        return True
 
 
 class AsyncoreConnection(AsyncoreConnectionBase):

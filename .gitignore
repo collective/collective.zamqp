@@ -6,6 +6,7 @@ dist
 
 .installed.cfg
 .mr.developer.cfg
+.ropeproject
 develop-eggs
 downloads
 coverage

@@ -1,11 +1,10 @@
 Changelog
 =========
 
-0.10.2 (unreleased)
+0.10.2 (2013-03-14)
 -------------------
 
-- Nothing changed yet.
-
+- Fix to process Pika timeouts on every asyncore poll to fix heartbeat issues
 
 0.10.1 (2013-03-13)
 -------------------

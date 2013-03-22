@@ -149,7 +149,7 @@ class Message(object, VTM):
 
         if self.state != 'ACK':
             self.acknowledged = False
-        if self.state == 'ACK' and exc_type == ConflictError:
+        if self.state == 'ACK' and issubclass(exc_type, ConflictError):
             if not getattr(self, '_aborted', False):
                 logger.info("Transaction aborted due to database conflict. "
                             "Message '%s' was acked before commit and could "
@@ -167,7 +167,7 @@ class Message(object, VTM):
                 # support transactional channel. DO NOT run multi-threaded
                 # consuming-server with transactional channel.
             # reject messages with requeue when ConflictError in ZPublisher
-            if self.state != 'ERROR' and exc_type == ConflictError:
+            if self.state != 'ERROR' and issubclass(exc_type, ConflictError):
                 # reject message with requeue
                 self.channel.basic_reject(
                     delivery_tag=self.method_frame.delivery_tag, requeue=True)

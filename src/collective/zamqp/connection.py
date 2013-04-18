@@ -219,13 +219,15 @@ class BrokerConnection(grok.GlobalUtility):
     password = 'guest'
 
     heartbeat = 0
+
+    prefetch_count = 0
     tx_select = False  # Be aware, that rollback for transactional channel
                        # is safe to use (and tx_select useful) only on
                        # dedicated single-threaded AMQP-consuming ZEO-clients.
 
     def __init__(self, connection_id=None, hostname=None, port=None,
                  virtual_host=None, username=None, password=None,
-                 heartbeat=None, tx_select=None):
+                 heartbeat=None, prefetch_count=None, tx_select=None):
 
         # Allow class variables to provide defaults for:
 
@@ -240,35 +242,39 @@ class BrokerConnection(grok.GlobalUtility):
         if hostname is not None:
             self.hostname = hostname
         assert self.hostname is not None,\
-               u"Connection configuration is missing hostname."
+            u"Connection configuration is missing hostname."
 
         # port
         if port is not None:
             self.port = port
         assert self.port is not None,\
-               u"Connection configuration is missing port."
+            u"Connection configuration is missing port."
 
         # virtual_host
         if virtual_host is not None:
             self.virtual_host = virtual_host
         assert self.virtual_host is not None,\
-               u"Connection configuration is missing virtual_host."
+            u"Connection configuration is missing virtual_host."
 
         # username
         if username is not None:
             self.username = username
         assert self.username is not None,\
-               u"Connection configuration is missing username."
+            u"Connection configuration is missing username."
 
         # password
         if password is not None:
             self.password = password
         assert self.password is not None,\
-               u"Connection configuration is missing password."
+            u"Connection configuration is missing password."
 
         # heartbeat
         if heartbeat is not None:
             self.heartbeat = heartbeat
+
+        # prefetch_count
+        if prefetch_count is not None:
+            self.prefetch_count = prefetch_count
 
         # tx_select
         if tx_select is not None:
@@ -326,6 +332,18 @@ class BrokerConnection(grok.GlobalUtility):
     def on_channel_open(self, channel):
         self._channel = channel
         self._channel.add_on_close_callback(self.on_channel_closed)
+
+        if self.prefetch_count:
+            from pika import spec
+            self._channel.transport.rpc(
+                spec.Basic.Qos(0, 1, False),
+                self.on_qos_ok,
+                [spec.Basic.QosOk]
+            )
+        else:
+            self.on_qos_ok(self._channel)
+
+    def on_qos_ok(self, channel):
         if self.tx_select:
             channel.tx_select(self.on_channel_tx_select)
         else:

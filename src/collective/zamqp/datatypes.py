@@ -25,6 +25,8 @@ class BrokerConnectionFactory(object):
         self.password = section.password
 
         self.heartbeat = section.heartbeat
+
+        self.prefetch_count = section.prefetch_count
         self.tx_select = section.tx_select
 
         # generate ping-keepalive until heartbeat really works
@@ -56,6 +58,7 @@ class BrokerConnectionFactory(object):
                                       username=self.username,
                                       password=self.password,
                                       heartbeat=self.heartbeat,
+                                      prefetch_count=self.prefetch_count,
                                       tx_select=self.tx_select)
 
         provideUtility(connection, IBrokerConnection, name=self.connection_id)

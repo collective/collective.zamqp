@@ -38,6 +38,11 @@
        AMQP heartbeat interval in seconds, defaults to 0 to disable heartbeat.
        </description>
      </key>
+     <key name="prefetch_count" datatype="integer" default="0">
+       <description>
+       AMQP channel prefetch count limit, defaults to 0 for no limit.
+       </description>
+     </key>
      <key name="tx_select" datatype="boolean" default="off">
        <description>
        Use transactional AMQP channels, defaults to off.

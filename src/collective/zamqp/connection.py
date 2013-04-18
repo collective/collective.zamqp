@@ -336,7 +336,7 @@ class BrokerConnection(grok.GlobalUtility):
         if self.prefetch_count:
             from pika import spec
             self._channel.transport.rpc(
-                spec.Basic.Qos(0, 1, False),
+                spec.Basic.Qos(0, self.prefetch_count, False),
                 self.on_qos_ok,
                 [spec.Basic.QosOk]
             )

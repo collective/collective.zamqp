@@ -75,7 +75,12 @@ class Message(object, VTM):
     def body(self):
         if self._deserialized_body is None:
             # de-serializer body when its content_type is supported
-            content_type = getattr(self.header_frame, "content_type", None)
+            content_type = getattr(self.header_frame, 'content_type', None)
+            # XXX: Sometimes must go deeper to find the content_type
+            if content_type is None:
+                content_type = (
+                    getattr(self.header_frame, 'headers', None) or {}
+                ).get('properties', {}).get('content_type', {})
             util = queryUtility(ISerializer, name=content_type)
             if util:
                 self._deserialized_body =\

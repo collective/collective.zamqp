@@ -92,11 +92,18 @@ TESTING_FIXTURE = Testing()
 class ZAMQP(Layer):
     defaultBases = (RABBIT_FIXTURE, z2.STARTUP)
 
-    def __init__(self, zserver=False):
+    def __init__(self, user_id='Anonymous User',
+                 zserver=False, trace_on=False):
         super(ZAMQP, self).__init__()
         self.zserver = zserver
+        self.trace_on = trace_on
+        self.user_id = user_id
 
     def setUp(self):
+
+        # Enable trace
+        if self.trace_on:
+            self['rabbitctl']('trace_on')
 
         # Define dummy request handler to replace ZPublisher
 
@@ -116,15 +123,18 @@ class ZAMQP(Layer):
         # Create connections and consuming servers for registered
         # producers and consumers
 
+        from zope.interface import Interface
         from zope.component import getSiteManager
         from collective.zamqp.interfaces import (
             IBrokerConnection,
             IProducer,
-            IConsumer
+            IConsumer,
+            IMessageArrivedEvent
         )
         from collective.zamqp.connection import BrokerConnection
         from collective.zamqp.server import ConsumingServer
         from collective.zamqp.producer import Producer
+        from collective.zamqp.consumer import Consumer
 
         sm = getSiteManager()
 
@@ -146,6 +156,28 @@ class ZAMQP(Layer):
                 sm.registerUtility(producer, provided=IProducer,
                                    name=connection.connection_id)
 
+        # Register Firehose
+        if self.trace_on:
+            class IFirehoseMessage(Interface):
+                """Marker interface for firehose message"""
+
+            def handleFirehoseMessage(message, event):
+                print message.method_frame
+                print message.header_frame
+                print message.body
+
+            consumer = Consumer("amq.rabbitmq.trace",
+                                exchange="amq.rabbitmq.trace",
+                                queue="", routing_key="#", durable=False,
+                                auto_declare=True, marker=IFirehoseMessage)
+
+            sm.registerUtility(consumer, provided=IConsumer,
+                               name="amq.rabbitmq.trace")
+
+            sm.registerHandler(
+                handleFirehoseMessage,
+                (IFirehoseMessage, IMessageArrivedEvent))
+
         for consumer in sm.getAllUtilitiesRegisteredFor(IConsumer):
             if not consumer.connection_id in connections:
                 connection = BrokerConnection(consumer.connection_id,
@@ -164,16 +196,35 @@ class ZAMQP(Layer):
             if not consumer.connection_id in consuming_servers:
                 if self.zserver:
                     ConsumingServer(consumer.connection_id, 'plone',
+                                    user_id=self.user_id,
                                     handler=zserver_handler)
                 else:
                     ConsumingServer(consumer.connection_id, 'plone',
+                                    user_id=self.user_id,
                                     handler=handler)
                 consuming_servers.append(consumer.connection_id)
+
+            # generate default producer with the name of the connection
+            producer = Producer(connection.connection_id, exchange="",
+                                routing_key="", durable=False,
+                                auto_declare=False)
+            sm.registerUtility(producer, provided=IProducer,
+                               name=connection.connection_id)
 
         # Connect all connections
 
         from collective.zamqp import connection
         connection.connect_all()
+
+    def testSetUp(self):
+        # Re-enable trace
+        if self.trace_on:
+            self['rabbitctl']('trace_on')
+
+    def testTearDown(self):
+        # Disable trace
+        if self.trace_on:
+            self['rabbitctl']('trace_off')
 
     # def testTearDown(self):
     #     from zope.component import getUtilitiesFor
@@ -183,13 +234,22 @@ class ZAMQP(Layer):
     #             connection._channel.close()
 
 ZAMQP_FIXTURE = ZAMQP()
+ZAMQP_ADMIN_FIXTURE = ZAMQP(user_id='admin')
+
+ZAMQP_DEBUG_FIXTURE = ZAMQP(trace_on=True)
+ZAMQP_ADMIN_DEBUG_FIXTURE = ZAMQP(user_id='admin', trace_on=True)
 
 ZAMQP_ZSERVER_FIXTURE = ZAMQP(zserver=True)
+ZAMQP_ZSERVER_ADMIN_FIXTURE = ZAMQP(user_id='admin', zserver=True)
 
+ZAMQP_ZSERVER_DEBUG_FIXTURE = ZAMQP(zserver=True, trace_on=True)
+ZAMQP_ZSERVER_ADMIN_DEBUG_FIXTURE = ZAMQP(user_id='admin',
+                                          zserver=True, trace_on=True)
 
 ZAMQP_INTEGRATION_TESTING = z2.IntegrationTesting(
     bases=(TESTING_FIXTURE, ZAMQP_FIXTURE),
     name='ZAMQP:Integration')
+
 ZAMQP_FUNCTIONAL_TESTING = z2.FunctionalTesting(
     bases=(TESTING_FIXTURE, ZAMQP_FIXTURE),
     name='ZAMQP:Functional')

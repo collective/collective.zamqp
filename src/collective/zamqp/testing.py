@@ -165,6 +165,7 @@ class ZAMQP(Layer):
                 print message.method_frame
                 print message.header_frame
                 print message.body
+                message.ack()
 
             consumer = Consumer("amq.rabbitmq.trace",
                                 exchange="amq.rabbitmq.trace",

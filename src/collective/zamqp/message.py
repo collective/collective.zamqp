@@ -29,6 +29,8 @@ from collective.zamqp.transactionmanager import VTM
 import logging
 logger = logging.getLogger('collective.zamqp')
 
+_EMPTY_MARKER = object()
+
 
 class Message(object, VTM):
     """A message that can be transaction aware"""
@@ -59,7 +61,7 @@ class Message(object, VTM):
                  method_frame=None, channel=None, tx_select=None):
 
         self._serialized_body = body
-        self._deserialized_body = None
+        self._deserialized_body = _EMPTY_MARKER
 
         self.header_frame = header_frame
         self.method_frame = method_frame
@@ -73,7 +75,7 @@ class Message(object, VTM):
 
     @property
     def body(self):
-        if self._deserialized_body is None:
+        if self._deserialized_body is _EMPTY_MARKER:
             # de-serializer body when its content_type is supported
             content_type = getattr(self.header_frame, 'content_type', None)
             # XXX: Sometimes must go deeper to find the content_type
@@ -86,7 +88,7 @@ class Message(object, VTM):
                 self._deserialized_body =\
                     util.deserialize(self._serialized_body)
 
-        if self._deserialized_body is not None:
+        if self._deserialized_body is not _EMPTY_MARKER:
             return self._deserialized_body
 
         return self._serialized_body

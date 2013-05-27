@@ -23,5 +23,5 @@ While we are still documenting and testing **collective.zamqp**,
 you may want to take a look at `collective.zamqpdemo
 <http://github.com/datakurre/collective.zamqpdemo/>`_ for an example of use.
 
-.. image:: https://secure.travis-ci.org/datakurre/collective.zamqp.png
-     :target: http://travis-ci.org/datakurre/collective.zamqp
+.. image:: https://secure.travis-ci.org/collective/collective.zamqp.png
+     :target: http://travis-ci.org/collective/collective.zamqp

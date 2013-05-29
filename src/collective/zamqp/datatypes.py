@@ -129,9 +129,12 @@ class ConsumingServerFactory(object):
         self.connection_id = section.connection_id
         self.site_id = section.site_id
         self.user_id = section.user_id or 'Anonymous User'
+        self.hostname = section.hostname
+        self.port = section.port
+        self.scheme = section.scheme
 
         # Just in case, mimic ZServer.datatypes.ServerFactory
-        self.ip = self.host = self.port = None
+        self.ip = None
 
         if section.override_lifetime_loop:
             Lifetime.lifetime_loop = lifetime_loop  # override lifetime_loop
@@ -150,4 +153,7 @@ class ConsumingServerFactory(object):
         return ConsumingServer(self.connection_id,
                                self.site_id,
                                self.user_id,
+                               self.scheme,
+                               self.hostname,
+                               self.port,
                                access_logger)

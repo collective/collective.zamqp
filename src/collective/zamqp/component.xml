@@ -72,6 +72,24 @@
        only.
        </description>
      </key>
+     <key name="hostname" datatype="string">
+       <description>
+       Hostname will be passed using a fake request into registered consumers
+       similar to Zope Clockserver.
+       </description>
+     </key>
+     <key name="port" datatype="integer" default="80">
+       <description>
+       Port will be passed using a fake request into registered consumers
+       similar to Zope Clockserver.
+       </description>
+     </key>
+     <key name="scheme" datatype="string" default="http">
+       <description>
+       Scheme will be passed using a fake request into registered consumers
+       similar to Zope Clockserver.
+       </description>
+     </key>
      <key name="site_id" datatype="string">
        <description>
        The id of a site, which should be the context when consuming the AMQP

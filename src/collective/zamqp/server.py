@@ -92,13 +92,21 @@ class ConsumingServer(object):
     # required by ZServer
     SERVER_IDENT = 'AMQP'
 
+    # Use VirtualHostMonster
+    _USE_VHM = True
+
     def __init__(self, connection_id, site_id, user_id='Anonymous User',
+                 scheme='https', hostname=None, port=80,
                  logger=None, handler=None):
 
         h = self.headers = []
         h.append('User-Agent: AMQP Consuming Server')
         h.append('Accept: text/html,text/plain')
-        h.append('Host: %s' % socket.gethostname())
+        if not hostname:
+            hostname = socket.gethostname()
+            self._USE_VHM = False
+
+        h.append('Host: %s' % hostname)
 
         self.logger = LogHelper(logger)
         self.log_info(("AMQP Consuming Server for connection '%s' started "
@@ -110,9 +118,12 @@ class ConsumingServer(object):
             handler = handle
         self.zhandler = handler
 
+        self.hostname = hostname
         self.connection_id = connection_id
         self.site_id = site_id
         self.user_id = user_id
+        self.port = port
+        self.scheme = scheme
 
         self.consumers = []
         provideHandler(self.on_before_broker_connect,
@@ -136,14 +147,24 @@ class ConsumingServer(object):
         exchange = getattr(message.method_frame, 'exchange', '') or '(default)'
         routing_key = getattr(message.method_frame, 'routing_key', '')
         correlation_id = getattr(message.header_frame, 'correlation_id', '')
-        if correlation_id:
-            method = '%s/@@zamqp-consumer/%s/%s/%s/%s' % (
-                self.site_id,
-                self.connection_id, exchange, routing_key, correlation_id)
+
+        _params = (exchange, routing_key)
+        if self._USE_VHM:
+            _method = \
+                "/VirtualHostBase" + \
+                "/{self.scheme}/{self.hostname}:{self.port}/{self.site_id}" + \
+                "/VirtualHostRoot" + \
+                "/@@zamqp-consumer/{self.connection_id}/{0}/{1}"
         else:
-            method = '%s/@@zamqp-consumer/%s/%s/%s' % (
-                self.site_id,
-                self.connection_id, exchange, routing_key)
+            _method = \
+                "/{self.site_id}" + \
+                "/@@zamqp-consumer/{self.connection_id}/{0}/{1}"
+
+        if correlation_id:
+            _method += "/{2}"
+            _params += (correlation_id, )
+
+        method = _method.format(self=self, *_params)
 
         out = StringIO.StringIO()
         s_req = '%s %s HTTP/%s' % ('GET', method, '1.0')

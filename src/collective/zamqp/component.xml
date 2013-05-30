@@ -15,7 +15,7 @@
      </key>
      <key name="port" datatype="integer" default="5672">
        <description>
-       TCP port to connecto, defaults to 5672.
+       TCP port to connect to, defaults to 5672.
        </description>
      </key>
      <key name="virtual_host" datatype="string" default="/">
@@ -98,7 +98,7 @@
      </key>
      <key name="user_id" datatype="string">
        <description>
-       Optional user id of the user, whose privileges are used to consume
+       Optional user id of the Plone user, whose privileges are used to consume
        the messages. By default, the messages are consumed as Anonymous User
        calling trusted filesystem code.
        </description>

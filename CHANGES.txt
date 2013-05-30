@@ -9,6 +9,9 @@ Changelog
   using VirtualHostMonster.
   [saily]
 
+- Documentation updates
+  [saily]
+
 
 0.10.2 (2013-03-14)
 -------------------

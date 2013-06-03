@@ -15,7 +15,7 @@
      </key>
      <key name="port" datatype="integer" default="5672">
        <description>
-       TCP port to connecto, defaults to 5672.
+       TCP port to connect to, defaults to 5672.
        </description>
      </key>
      <key name="virtual_host" datatype="string" default="/">
@@ -72,6 +72,25 @@
        only.
        </description>
      </key>
+     <key name="hostname" datatype="string">
+       <description>
+       Hostname will be passed using a fake request into registered consumers
+       similar to Zope Clockserver. Setting hostname will enable use of
+       VirtualHostMonster-wrapped method calls by default (see use_vhm).
+       </description>
+     </key>
+     <key name="port" datatype="integer" default="80">
+       <description>
+       Port will be passed using a fake request into registered consumers
+       similar to Zope Clockserver.
+       </description>
+     </key>
+     <key name="scheme" datatype="string" default="http">
+       <description>
+       Scheme will be passed using a fake request into registered consumers
+       similar to Zope Clockserver.
+       </description>
+     </key>
      <key name="site_id" datatype="string">
        <description>
        The id of a site, which should be the context when consuming the AMQP
@@ -80,9 +99,16 @@
      </key>
      <key name="user_id" datatype="string">
        <description>
-       Optional user id of the user, whose privileges are used to consume
+       Optional user id of the Plone user, whose privileges are used to consume
        the messages. By default, the messages are consumed as Anonymous User
        calling trusted filesystem code.
+       </description>
+     </key>
+     <key name="use_vhm" datatype="boolean" default="on">
+       <description>
+       Create VirtualHostMonster-wrapped method calls when hostname is set. VHM
+       is used to tell portal the configured real public hostname and  to hide
+       portal's id from path.
        </description>
      </key>
      <key name="override_lifetime_loop" datatype="boolean" default="on">

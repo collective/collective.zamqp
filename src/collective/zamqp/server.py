@@ -20,7 +20,6 @@
 """AMQP consuming server, which generates a faux HTTP request for every
 consumed message by adopting the asyncore API"""
 
-import logging
 import os
 import socket
 import time
@@ -38,6 +37,7 @@ from zope.component import\
     getUtility, provideUtility, getUtilitiesFor, provideHandler
 
 from collective.zamqp import logger
+from collective.zamqp import loglevel
 from collective.zamqp.interfaces import\
     IBrokerConnection, IBeforeBrokerConnectEvent,\
     IConsumer, IConsumingRequest
@@ -91,29 +91,42 @@ class ConsumingServer(object):
     # required by ZServer
     SERVER_IDENT = 'AMQP'
 
+    # Use VirtualHostMonster
+    _USE_VHM = True
+
     def __init__(self, connection_id, site_id, user_id='Anonymous User',
-                 host=None, logger=None, handler=None):
+                 scheme='https', hostname=None, port=80, use_vhm=True,
+                 logger=None, handler=None):
+
+        self._USE_VHM = use_vhm
 
         h = self.headers = []
         h.append('User-Agent: AMQP Consuming Server')
         h.append('Accept: text/html,text/plain')
-        if not host:
-            host = socket.gethostname()
-        h.append('Host: %s' % host)
+        if not hostname:
+            hostname = socket.gethostname()
+        if use_vhm or ':' in hostname:
+            h.append('Host: {0:s}'.format(hostname))
+        else:
+            h.append('Host: {0:s}:{1:d}'.format(hostname, port))
 
+        # XXX: This is from ZopeClockServer, do we need that?
         self.logger = LogHelper(logger)
-        self.log_info(("AMQP Consuming Server for connection '%s' started "
-                       "(site '%s' user: '%s')")
-                      % (connection_id, site_id, user_id))
+        self.log(("AMQP Consuming Server for connection '%s' started "
+                  "(site '%s' user: '%s')")
+                 % (connection_id, site_id, user_id))
 
         if handler is None:
             # for unit testing
             handler = handle
         self.zhandler = handler
 
+        self.hostname = hostname
         self.connection_id = connection_id
         self.site_id = site_id
         self.user_id = user_id
+        self.port = port
+        self.scheme = scheme
 
         self.consumers = []
         provideHandler(self.on_before_broker_connect,
@@ -123,11 +136,11 @@ class ConsumingServer(object):
     # logging and warning methods. In general, log is for 'hit' logging
     # and 'log_info' is for informational, warning and error logging.
 
-    def log(self, message):
+    def log_error(self, message):
         logger.error(message)
 
-    def log_info(self, message, type='debug'):
-        logger.log(getattr(logging, type.upper(), 20), message)
+    def log(self, message, type=None):
+        logger.log(loglevel, message)
 
     def get_requests_and_response(self, message):
         # All ZAMQP-requests are send to the same 'zamqp-consumer'-view. To
@@ -137,14 +150,24 @@ class ConsumingServer(object):
         exchange = getattr(message.method_frame, 'exchange', '') or '(default)'
         routing_key = getattr(message.method_frame, 'routing_key', '')
         correlation_id = getattr(message.header_frame, 'correlation_id', '')
-        if correlation_id:
-            method = '%s/@@zamqp-consumer/%s/%s/%s/%s' % (
-                self.site_id,
-                self.connection_id, exchange, routing_key, correlation_id)
+
+        _params = (exchange, routing_key)
+        if self._USE_VHM:
+            _method = \
+                "/VirtualHostBase" + \
+                "/{self.scheme}/{self.hostname}:{self.port}/{self.site_id}" + \
+                "/VirtualHostRoot" + \
+                "/@@zamqp-consumer/{self.connection_id}/{0}/{1}"
         else:
-            method = '%s/@@zamqp-consumer/%s/%s/%s' % (
-                self.site_id,
-                self.connection_id, exchange, routing_key)
+            _method = \
+                "/{self.site_id}" + \
+                "/@@zamqp-consumer/{self.connection_id}/{0}/{1}"
+
+        if correlation_id:
+            _method += "/{2}"
+            _params += (correlation_id, )
+
+        method = _method.format(self=self, *_params)
 
         out = StringIO.StringIO()
         s_req = '%s %s HTTP/%s' % ('GET', method, '1.0')
@@ -257,10 +280,9 @@ class ConsumingServer(object):
                              self.on_message_received)
 
     def on_message_received(self, message):
-        logger.debug(("Received message '%s' sent to exchange '%s' with "
-                      "routing key '%s'"),
-                     message.method_frame.delivery_tag,
-                     message.method_frame.exchange,
-                     message.method_frame.routing_key)
+        self.log(("Received message '%s' sent to exchange '%s' with "
+                  "routing key '%s'") % (message.method_frame.delivery_tag,
+                                         message.method_frame.exchange,
+                                         message.method_frame.routing_key))
         req, zreq, resp = self.get_requests_and_response(message)
         self.zhandler('Zope2', zreq, resp)

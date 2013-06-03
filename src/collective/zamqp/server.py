@@ -99,15 +99,17 @@ class ConsumingServer(object):
                  scheme='https', hostname=None, port=80, use_vhm=True,
                  logger=None, handler=None):
 
+        self._USE_VHM = use_vhm
+
         h = self.headers = []
         h.append('User-Agent: AMQP Consuming Server')
         h.append('Accept: text/html,text/plain')
         if not hostname:
             hostname = socket.gethostname()
-
-        self._USE_VHM = use_vhm
-
-        h.append('Host: %s' % hostname)
+        if use_vhm or ':' in hostname:
+            h.append('Host: {0:s}'.format(hostname))
+        else:
+            h.append('Host: {0:s}:{1:s}'.format(hostname, port))
 
         self.logger = LogHelper(logger)
         self.log_info(("AMQP Consuming Server for connection '%s' started "

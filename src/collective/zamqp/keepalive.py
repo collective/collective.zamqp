@@ -53,12 +53,10 @@ from grokcore import component as grok
 
 from zope.component import getUtility
 
+from collective.zamqp import logger
 from collective.zamqp.producer import Producer
 from collective.zamqp.consumer import Consumer
 from collective.zamqp.interfaces import IProducer
-
-import logging
-logger = logging.getLogger('collective.zamqp')
 
 
 class PingProducer(Producer):

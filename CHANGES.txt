@@ -4,7 +4,7 @@ Changelog
 0.10.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Reduce amount of logging, fixes #2.  [saily]
 
 
 0.10.2 (2013-03-14)

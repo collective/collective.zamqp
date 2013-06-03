@@ -20,9 +20,10 @@
 """AMQP consuming server, which generates a faux HTTP request for every
 consumed message by adopting the asyncore API"""
 
+import logging
 import os
-import time
 import socket
+import time
 import StringIO
 import posixpath
 
@@ -36,12 +37,10 @@ from zope.interface import implements
 from zope.component import\
     getUtility, provideUtility, getUtilitiesFor, provideHandler
 
+from collective.zamqp import logger
 from collective.zamqp.interfaces import\
     IBrokerConnection, IBeforeBrokerConnectEvent,\
     IConsumer, IConsumingRequest
-
-import logging
-logger = logging.getLogger('collective.zamqp')
 
 
 class LogHelper:
@@ -93,12 +92,14 @@ class ConsumingServer(object):
     SERVER_IDENT = 'AMQP'
 
     def __init__(self, connection_id, site_id, user_id='Anonymous User',
-                 logger=None, handler=None):
+                 host=None, logger=None, handler=None):
 
         h = self.headers = []
         h.append('User-Agent: AMQP Consuming Server')
         h.append('Accept: text/html,text/plain')
-        h.append('Host: %s' % socket.gethostname())
+        if not host:
+            host = socket.gethostname()
+        h.append('Host: %s' % host)
 
         self.logger = LogHelper(logger)
         self.log_info(("AMQP Consuming Server for connection '%s' started "
@@ -125,7 +126,7 @@ class ConsumingServer(object):
     def log(self, message):
         logger.error(message)
 
-    def log_info(self, message, type='info'):
+    def log_info(self, message, type='debug'):
         logger.log(getattr(logging, type.upper(), 20), message)
 
     def get_requests_and_response(self, message):
@@ -256,10 +257,10 @@ class ConsumingServer(object):
                              self.on_message_received)
 
     def on_message_received(self, message):
-        logger.info(("Received message '%s' sent to exchange '%s' with "
-                     "routing key '%s'"),
-                    message.method_frame.delivery_tag,
-                    message.method_frame.exchange,
-                    message.method_frame.routing_key)
+        logger.debug(("Received message '%s' sent to exchange '%s' with "
+                      "routing key '%s'"),
+                     message.method_frame.delivery_tag,
+                     message.method_frame.exchange,
+                     message.method_frame.routing_key)
         req, zreq, resp = self.get_requests_and_response(message)
         self.zhandler('Zope2', zreq, resp)

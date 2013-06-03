@@ -4,7 +4,13 @@ Changelog
 0.10.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Added a configureable scheme, hostname and port keyword to be passed into
+  fake request object in consumers. We well automatically rewrite those URLs
+  using VirtualHostMonster.
+  [saily]
+
+- Documentation updates
+  [saily]
 
 
 0.10.2 (2013-03-14)

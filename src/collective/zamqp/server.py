@@ -109,7 +109,7 @@ class ConsumingServer(object):
         if use_vhm or ':' in hostname:
             h.append('Host: {0:s}'.format(hostname))
         else:
-            h.append('Host: {0:s}:{1:s}'.format(hostname, str(port)))
+            h.append('Host: {0:s}:{1:d}'.format(hostname, port))
 
         self.logger = LogHelper(logger)
         self.log_info(("AMQP Consuming Server for connection '%s' started "

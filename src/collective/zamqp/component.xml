@@ -75,7 +75,8 @@
      <key name="hostname" datatype="string">
        <description>
        Hostname will be passed using a fake request into registered consumers
-       similar to Zope Clockserver.
+       similar to Zope Clockserver. Setting hostname will enable use of
+       VirtualHostMonster-wrapped method calls by default (see use_vhm).
        </description>
      </key>
      <key name="port" datatype="integer" default="80">
@@ -101,6 +102,13 @@
        Optional user id of the Plone user, whose privileges are used to consume
        the messages. By default, the messages are consumed as Anonymous User
        calling trusted filesystem code.
+       </description>
+     </key>
+     <key name="use_vhm" datatype="boolean" default="on">
+       <description>
+       Create VirtualHostMonster-wrapped method calls when hostname is set. VHM
+       is used to tell portal the configured real public hostname and  to hide
+       portal's id from path.
        </description>
      </key>
      <key name="override_lifetime_loop" datatype="boolean" default="on">

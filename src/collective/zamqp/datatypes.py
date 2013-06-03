@@ -132,6 +132,7 @@ class ConsumingServerFactory(object):
         self.hostname = section.hostname
         self.port = section.port
         self.scheme = section.scheme
+        self.use_vhm = section.use_vhm
 
         # Just in case, mimic ZServer.datatypes.ServerFactory
         self.ip = None
@@ -156,4 +157,5 @@ class ConsumingServerFactory(object):
                                self.scheme,
                                self.hostname,
                                self.port,
+                               self.use_vhm,
                                access_logger)

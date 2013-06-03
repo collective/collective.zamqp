@@ -96,7 +96,7 @@ class ConsumingServer(object):
     _USE_VHM = True
 
     def __init__(self, connection_id, site_id, user_id='Anonymous User',
-                 scheme='https', hostname=None, port=80,
+                 scheme='https', hostname=None, port=80, use_vhm=True,
                  logger=None, handler=None):
 
         h = self.headers = []
@@ -104,7 +104,8 @@ class ConsumingServer(object):
         h.append('Accept: text/html,text/plain')
         if not hostname:
             hostname = socket.gethostname()
-            self._USE_VHM = False
+
+        self._USE_VHM = use_vhm
 
         h.append('Host: %s' % hostname)
 

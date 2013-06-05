@@ -39,7 +39,7 @@ ZPublisher (exactly like Zope ClockServer). Therefore AMQP-messages are handled
 events and everything else behaving normally.
 
 **collective.zamqp** is an almost complete rewrite of affinitic.zamqp
-<http://pypi.python.org/pypi/affinitic.zamqp>`_, but preserves its ideas on how
+`<http://pypi.python.org/pypi/affinitic.zamqp>`_, but preserves its ideas on how
 to setup AMQP-routing with simple grok-based configuration of connections,
 producers and consumers.
 

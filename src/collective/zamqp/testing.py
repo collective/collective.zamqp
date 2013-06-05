@@ -198,11 +198,15 @@ class ZAMQP(Layer):
                 if self.zserver:
                     ConsumingServer(consumer.connection_id, 'plone',
                                     user_id=self.user_id,
-                                    handler=zserver_handler)
+                                    handler=zserver_handler,
+                                    hostname='nohost',  # taken from z2.Startup
+                                    port=80,
+                                    use_vhm=False)
                 else:
                     ConsumingServer(consumer.connection_id, 'plone',
                                     user_id=self.user_id,
-                                    handler=handler)
+                                    handler=handler,
+                                    use_vhm=False)
                 consuming_servers.append(consumer.connection_id)
 
             # generate default producer with the name of the connection

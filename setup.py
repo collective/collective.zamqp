@@ -28,6 +28,7 @@ setup(
     },
     extras_require={
         'test': [
+            'testfixtures',
             'rabbitfixture',
             'plone.testing',
             'zope.configuration',

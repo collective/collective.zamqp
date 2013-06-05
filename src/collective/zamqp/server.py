@@ -96,7 +96,7 @@ class ConsumingServer(object):
     _USE_VHM = True
 
     def __init__(self, connection_id, site_id, user_id='Anonymous User',
-                 scheme='https', hostname=None, port=80, use_vhm=True,
+                 scheme='http', hostname=None, port=80, use_vhm=True,
                  logger=None, handler=None):
 
         self._USE_VHM = use_vhm

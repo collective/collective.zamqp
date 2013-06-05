@@ -1,13 +1,19 @@
 Changelog
 =========
 
+0.11.1 (unreleased)
+-------------------
+
+- Nothing changed yet.
+
+
 0.11.0 (2013-06-05)
 -------------------
 
 - Set ``use_vhm=False`` for ZAMQP Test Layer
   [saily]
 
-- Add option ``use_vhm``to make VHM-methods optional (to allow use of
+- Add option ``use_vhm`` to make VHM-methods optional (to allow use of
   hostname=localhost:8080/Plone in development)
   [Asko Soukka]
 

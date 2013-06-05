@@ -1,11 +1,15 @@
 Changelog
 =========
 
-0.10.3 (unreleased)
+0.11.0 (unreleased)
 -------------------
 
 - Set ``use_vhm=False`` for ZAMQP Test Layer
   [saily]
+
+- Add option ``use_vhm``to make VHM-methods optional (to allow use of
+  hostname=localhost:8080/Plone in development)
+  [Asko Soukka]
 
 - Added a configureable scheme, hostname and port keyword to be passed into
   fake request object in consumers. We well automatically rewrite those URLs
@@ -15,6 +19,15 @@ Changelog
 - Documentation updates
   [saily]
 
+- Add prefetch_count-option for connections
+  [Asko Soukka]
+
+- Add fixture with RabbitMQ trace firehose consumer to ease debugging
+  [Asko Soukka]
+
+- Fix to requeue messages also when subclass of ConflictError is raised during
+  commit (e.g. ReadConflictError)
+  [Asko Soukka]
 
 0.10.2 (2013-03-14)
 -------------------

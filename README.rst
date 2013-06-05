@@ -103,6 +103,8 @@ Explanation of configuration parameters
         Register producer, consumer, view and clock-server with the given
         integer timeout in seconds to keep the connection alive. Defaults
         ``0``.
+  ``prefetch_count`` (optional)
+        AMQP channel prefetch count limit, defaults to 0 for no limit.
 
 - amqp-consuming-server
 

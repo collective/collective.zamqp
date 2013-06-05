@@ -16,7 +16,7 @@ setup(
     keywords='',
     author='Asko Soukka',
     author_email='asko.soukka@iki.fi',
-    url='http://github.com/datakurre/collective.zamqp',
+    url='http://github.com/collective/collective.zamqp',
     license='ZPL',
     packages=find_packages('src', exclude=['ez_setup']),
     package_dir={'': 'src'},

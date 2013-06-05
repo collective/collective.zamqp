@@ -24,7 +24,7 @@ TODO
 
 While we are still documenting and testing **collective.zamqp**,
 you may want to take a look at `collective.zamqpdemo
-<http://github.com/datakurre/collective.zamqpdemo/>`_ for an example of use.
+<http://github.com/collective/collective.zamqpdemo/>`_ for an example of use.
 
 
 Installation
@@ -64,7 +64,6 @@ Both instances can be easily configured using buildout::
             heartbeat       120
             keepalive       60
         </amqp-broker-connection>
-
 
     [worker]
     <= instance
@@ -127,6 +126,10 @@ Explanation of configuration parameters
   ``port`` (optional)
         Configure port for virtual rewriting using VirtualHostMonster,
         default is ``80``. Will be ignored if no ``hostname`` is given.
+  ``use_vhm`` (optional)
+       Create VirtualHostMonster-wrapped method calls when hostname is set. VHM
+       is used to tell portal the configured real public hostname and to hide
+       portal's id from path. Defaults to *on* when *hostname* is given.
   ``site_id``
         The id of a site, which should be the context when consuming the AMQP
         messages, which the consumers of a consuming server consume. If a

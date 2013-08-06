@@ -18,6 +18,7 @@ import grokcore.component as grok
 
 from zope.component import getUtility, queryUtility, provideHandler
 
+from collective.zamqp import logger
 from collective.zamqp.interfaces import\
     IProducer, IBrokerConnection, IBeforeBrokerConnectEvent, ISerializer
 from collective.zamqp.transactionmanager import VTM
@@ -25,9 +26,6 @@ from collective.zamqp.connection import BlockingChannel
 
 from pika import BasicProperties
 from pika.callback import CallbackManager
-
-import logging
-logger = logging.getLogger('collective.zamqp')
 
 
 class Producer(grok.GlobalUtility, VTM):

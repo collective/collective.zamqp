@@ -22,12 +22,10 @@ from zope.interface import implements, implementedBy
 from zope.component import IFactory, queryUtility
 from zope.component.interfaces import ObjectEvent
 
+from collective.zamqp import logger
 from collective.zamqp.interfaces import\
     IMessage, IMessageArrivedEvent, ISerializer
 from collective.zamqp.transactionmanager import VTM
-
-import logging
-logger = logging.getLogger('collective.zamqp')
 
 _EMPTY_MARKER = object()
 
@@ -130,8 +128,8 @@ class Message(object, VTM):
         if self.channel and self.tx_select:
             self.channel.tx_commit()  # min support for transactional channel
 
-        logger.info("Handled message '%s' (status = '%s')",
-                    self.method_frame.delivery_tag, self.state)
+        logger.debug("Handled message '%s' (status = '%s')",
+                     self.method_frame.delivery_tag, self.state)
 
     def _reject(self, requeue=True):
         self.rejected = True
@@ -147,8 +145,8 @@ class Message(object, VTM):
         if self.channel and self.tx_select:
             self.channel.tx_commit()  # min support for transactional channel
 
-        logger.info("Rejected message '%s' (status = '%s')",
-                    self.method_frame.delivery_tag, self.state)
+        logger.debug("Rejected message '%s' (status = '%s')",
+                     self.method_frame.delivery_tag, self.state)
 
     def _abort(self):
         # collect execution info for guessing the reason for abort

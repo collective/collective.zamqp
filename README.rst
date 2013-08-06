@@ -69,6 +69,8 @@ Both instances can be easily configured using buildout::
     <= instance
     http-address = 8081
     zserver-threads = 1
+    environment-vars =
+        ZAMQP_LOGLEVEL INFO
     zope-conf-additional =
         ${instance:zope-conf-additional}
         <amqp-consuming-server>
@@ -141,3 +143,21 @@ Explanation of configuration parameters
         Optional user id of the Plone user, whose privileges are used to consume
         the messages. By default, the messages are consumed as Anonymous User
         calling trusted filesystem code.
+
+
+Configuring logging
+-------------------
+
+You may want to in/decrease ``collective.zamqp`` loglevel which can easily be
+done by passing an environment variable into worker instance as seen in
+buildout example above::
+
+    [worker]
+    ...
+    environment-vars =
+        ZAMQP_LOGLEVEL INFO
+    ...
+
+Valid parameters are:
+- DEBUG
+- INFO

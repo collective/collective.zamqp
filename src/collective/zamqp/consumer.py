@@ -36,11 +36,9 @@ except ImportError:  # BBB
 
 from Products.Five.browser import BrowserView
 
+from collective.zamqp import logger
 from collective.zamqp.interfaces import IConsumer, IErrorHandler
 from collective.zamqp.connection import BlockingChannel
-
-import logging
-logger = logging.getLogger('collective.zamqp')
 
 
 class Consumer(grok.GlobalUtility):
@@ -378,8 +376,8 @@ class ConsumingView(BrowserView):
                             "with routing key '%s'"),
                            delivery_tag, exchange, routing_key)
         else:
-            logger.info(("Letting Zope to commit database transaction for "
-                         u"message '%s' (status = '%s')"),
-                        delivery_tag, message.state)
+            logger.debug(("Letting Zope to commit database transaction for "
+                          u"message '%s' (status = '%s')"),
+                         delivery_tag, message.state)
 
         return u''  # 200 No Content

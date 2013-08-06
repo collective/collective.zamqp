@@ -21,8 +21,8 @@
 consumed message by adopting the asyncore API"""
 
 import os
-import time
 import socket
+import time
 import StringIO
 import posixpath
 
@@ -36,12 +36,11 @@ from zope.interface import implements
 from zope.component import\
     getUtility, provideUtility, getUtilitiesFor, provideHandler
 
+from collective.zamqp import logger
+from collective.zamqp import loglevel
 from collective.zamqp.interfaces import\
     IBrokerConnection, IBeforeBrokerConnectEvent,\
     IConsumer, IConsumingRequest
-
-import logging
-logger = logging.getLogger('collective.zamqp')
 
 
 class LogHelper:
@@ -111,10 +110,11 @@ class ConsumingServer(object):
         else:
             h.append('Host: {0:s}:{1:d}'.format(hostname, port))
 
+        # XXX: This is from ZopeClockServer, do we need that?
         self.logger = LogHelper(logger)
-        self.log_info(("AMQP Consuming Server for connection '%s' started "
-                       "(site '%s' user: '%s')")
-                      % (connection_id, site_id, user_id))
+        self.log(("AMQP Consuming Server for connection '%s' started "
+                  "(site '%s' user: '%s')")
+                 % (connection_id, site_id, user_id))
 
         if handler is None:
             # for unit testing
@@ -136,11 +136,11 @@ class ConsumingServer(object):
     # logging and warning methods. In general, log is for 'hit' logging
     # and 'log_info' is for informational, warning and error logging.
 
-    def log(self, message):
+    def log_error(self, message):
         logger.error(message)
 
-    def log_info(self, message, type='info'):
-        logger.log(getattr(logging, type.upper(), 20), message)
+    def log(self, message, type=None):
+        logger.log(loglevel, message)
 
     def get_requests_and_response(self, message):
         # All ZAMQP-requests are send to the same 'zamqp-consumer'-view. To
@@ -280,10 +280,9 @@ class ConsumingServer(object):
                              self.on_message_received)
 
     def on_message_received(self, message):
-        logger.info(("Received message '%s' sent to exchange '%s' with "
-                     "routing key '%s'"),
-                    message.method_frame.delivery_tag,
-                    message.method_frame.exchange,
-                    message.method_frame.routing_key)
+        self.log(("Received message '%s' sent to exchange '%s' with "
+                  "routing key '%s'") % (message.method_frame.delivery_tag,
+                                         message.method_frame.exchange,
+                                         message.method_frame.routing_key))
         req, zreq, resp = self.get_requests_and_response(message)
         self.zhandler('Zope2', zreq, resp)

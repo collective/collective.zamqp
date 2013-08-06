@@ -20,7 +20,9 @@ Changelog
 - Added a configureable scheme, hostname and port keyword to be passed into
   fake request object in consumers. We well automatically rewrite those URLs
   using VirtualHostMonster.
-  [saily]
+  [datakurre, saily]
+
+- Reduce amount of logging, fixes #2.  [saily]
 
 - Documentation updates
   [saily]

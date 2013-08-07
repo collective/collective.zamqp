@@ -159,5 +159,6 @@ buildout example above::
     ...
 
 Valid parameters are:
+
 - DEBUG
 - INFO

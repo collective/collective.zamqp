@@ -1,11 +1,16 @@
 Changelog
 =========
 
-0.11.1 (unreleased)
+0.12.0 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Fix to store durable publishable messages during reconnection period
+  in memory on the base of message's delivery_mode-proprety, not
+  producer's durable-property
+  [datakurre]
 
+- Combine loggers and reduce logging
+  [saily, datakurre]
 
 0.11.0 (2013-06-05)
 -------------------
@@ -15,7 +20,7 @@ Changelog
 
 - Add option ``use_vhm`` to make VHM-methods optional (to allow use of
   hostname=localhost:8080/Plone in development)
-  [Asko Soukka]
+  [datakurre]
 
 - Added a configureable scheme, hostname and port keyword to be passed into
   fake request object in consumers. We well automatically rewrite those URLs
@@ -28,14 +33,14 @@ Changelog
   [saily]
 
 - Add prefetch_count-option for connections
-  [Asko Soukka]
+  [datakurre]
 
 - Add fixture with RabbitMQ trace firehose consumer to ease debugging
-  [Asko Soukka]
+  [datakurre]
 
 - Fix to requeue messages also when subclass of ConflictError is raised during
   commit (e.g. ReadConflictError)
-  [Asko Soukka]
+  [datakurre]
 
 0.10.2 (2013-03-14)
 -------------------

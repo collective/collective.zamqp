@@ -308,7 +308,7 @@ class BrokerConnection(grok.GlobalUtility):
 
     def reconnect(self, conn=None):
         if not getattr(self, '_reconnection_timeout', None):
-            logger.info("Trying to reconnect connection '%s' in %s seconds",
+            logger.info(u"Trying to reconnect connection '%s' in %s seconds",
                         self.connection_id, self._reconnection_delay)
             self._reconnection_timeout =\
                 AsyncoreScheduling(self.connect, self._reconnection_delay)
@@ -348,7 +348,7 @@ class BrokerConnection(grok.GlobalUtility):
             self._callbacks.process(0, '_on_channel_open', self, self._channel)
 
     def on_channel_closed(self, code, text):
-        logger.warning("Channel closed with reason '%s %s'",
+        logger.warning(u"Channel closed with reason '%s %s'",
                        code, text)
         self._connection.close(code, text)
         self.reconnect()

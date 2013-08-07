@@ -13,6 +13,7 @@
 """Transaction aware AMQP message wrapper"""
 
 import sys
+import datetime
 
 import grokcore.component as grok
 
@@ -34,6 +35,8 @@ class Message(object, VTM):
     """A message that can be transaction aware"""
 
     implements(IMessage)
+
+    created_datetime = None
 
     header_frame = None
     method_frame = None
@@ -57,6 +60,8 @@ class Message(object, VTM):
 
     def __init__(self, body=None, header_frame=None,
                  method_frame=None, channel=None, tx_select=None):
+
+        self.created_datetime = datetime.datetime.utcnow()
 
         self._serialized_body = body
         self._deserialized_body = _EMPTY_MARKER
@@ -128,8 +133,9 @@ class Message(object, VTM):
         if self.channel and self.tx_select:
             self.channel.tx_commit()  # min support for transactional channel
 
-        logger.debug("Handled message '%s' (status = '%s')",
-                     self.method_frame.delivery_tag, self.state)
+        age = unicode(datetime.datetime.utcnow() - self.created_datetime)
+        logger.default(u"Handled message '%s' (status = '%s', age = '%s')",
+                       self.method_frame.delivery_tag, self.state, age)
 
     def _reject(self, requeue=True):
         self.rejected = True
@@ -145,8 +151,9 @@ class Message(object, VTM):
         if self.channel and self.tx_select:
             self.channel.tx_commit()  # min support for transactional channel
 
-        logger.debug("Rejected message '%s' (status = '%s')",
-                     self.method_frame.delivery_tag, self.state)
+        age = unicode(datetime.datetime.utcnow() - self.created_datetime)
+        logger.default(u"Rejected message '%s' (status = '%s', age = '%s')",
+                       self.method_frame.delivery_tag, self.state)
 
     def _abort(self):
         # collect execution info for guessing the reason for abort
@@ -156,10 +163,11 @@ class Message(object, VTM):
             self.acknowledged = False
         if self.state == 'ACK' and issubclass(exc_type, ConflictError):
             if not getattr(self, '_aborted', False):
-                logger.info("Transaction aborted due to database conflict. "
-                            "Message '%s' was acked before commit and could "
-                            "not be requeued (status = '%s')",
-                            self.method_frame.delivery_tag, self.state)
+                logger.warning(
+                    u"Transaction aborted due to database conflict. "
+                    u"Message '%s' was acked before commit and could "
+                    u"not be requeued (status = '%s')",
+                    self.method_frame.delivery_tag, self.state)
                 self._aborted = True
         elif self.state not in ('FAILED', 'REQUEUED'):
             # on transactional channel, rollback on abort
@@ -171,6 +179,7 @@ class Message(object, VTM):
                 # only to make single-threaded AMQP-consuming ZEO-clients
                 # support transactional channel. DO NOT run multi-threaded
                 # consuming-server with transactional channel.
+
             # reject messages with requeue when ConflictError in ZPublisher
             if self.state != 'ERROR' and issubclass(exc_type, ConflictError):
                 # reject message with requeue
@@ -178,9 +187,10 @@ class Message(object, VTM):
                     delivery_tag=self.method_frame.delivery_tag, requeue=True)
                 self.state = "REQUEUED"
 
-                logger.info("Transaction aborted due to database conflict. "
-                            "Requeued message '%s' (status = '%s')",
-                            self.method_frame.delivery_tag, self.state)
+                logger.default(
+                    u"Transaction aborted due to database conflict. "
+                    u"Requeued message '%s' (status = '%s')",
+                    self.method_frame.delivery_tag, self.state)
             # otherwise, message handling has failed and un-acknowledged
             else:
                 self.state = 'FAILED'
@@ -190,9 +200,11 @@ class Message(object, VTM):
             self._ack()
         if self.rejected:
             if self.state == 'ACK':
-                logger.warn("Message '%s' was both acknowledged and rejected "
-                            "(status = '%s'). Rejection was skipped",
-                            self.method_frame.delivery_tag, self.state)
+                logger.warning(
+                    u"Message '%s' was both acknowledged and rejected "
+                    u"(status = '%s'). Rejection was cancelled and "
+                    u"message was acknowledged",
+                    self.method_frame.delivery_tag, self.state)
             elif self.state not in ['REJECTED', 'REQUEUED']:
                 self._reject(self.requeued)
 

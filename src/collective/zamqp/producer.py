@@ -325,7 +325,7 @@ class Producer(grok.GlobalUtility, VTM):
             self._channel.basic_publish(**kwargs)
             return True
 
-        elif self.durable:
+        elif getattr(kwargs.get("properties"), "delivery_mode", 1) == 2:
             logger.warning(u"No connection. Durable message was left into "
                            u"volatile memory to wait for a new connection "
                            u"'%s'", kwargs)

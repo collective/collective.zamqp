@@ -3,10 +3,21 @@ import logging
 import os
 
 
-logger = logging.getLogger('collective.zamqp')
+class Logger(object):
 
-loglevels = {
+    def __init__(self, name, default_level):
+        self.logger = logging.getLogger(name)
+        self.default_level = default_level
+
+    def default(self, message, *args, **kwargs):
+        self.logger.log(self.default_level, message, *args, **kwargs)
+
+    def __getattr__(self, item):
+        return getattr(self.logger, item)
+
+
+logger = Logger('collective.zamqp', default_level={
     'DEBUG': logging.DEBUG,
     'INFO': logging.INFO,
-}
-loglevel = loglevels.get(os.environ.get('ZAMQP_LOGLEVEL'), logging.DEBUG)
+}.get(os.environ.get('ZAMQP_LOGLEVEL'), logging.DEBUG))
+

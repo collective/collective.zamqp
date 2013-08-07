@@ -12,6 +12,7 @@
 ###
 """Consumer utility base class"""
 
+import datetime
 import sys
 import transaction
 
@@ -202,8 +203,8 @@ class Consumer(grok.GlobalUtility):
                                        callback=self.on_exchange_declared)
 
     def on_exchange_declared(self, frame):
-        logger.info("Consumer declared exchange '%s' on connection '%s'",
-                    self.exchange, self.connection_id)
+        logger.default(u"Consumer declared exchange '%s' on connection '%s'",
+                       self.exchange, self.connection_id)
         if self.queue_auto_declare and self.queue is not None\
                 and not self.queue.startswith('amq.'):
             self.declare_queue()
@@ -220,8 +221,8 @@ class Consumer(grok.GlobalUtility):
 
     def on_queue_declared(self, frame):
         self._queue = frame.method.queue  # get the real queue name
-        logger.info("Consumer declared queue '%s' on connection '%s'",
-                    self._queue, self.connection_id)
+        logger.default(u"Consumer declared queue '%s' on connection '%s'",
+                       self._queue, self.connection_id)
         if self.auto_declare and self.exchange:
             self.bind_queue()
         else:
@@ -238,9 +239,9 @@ class Consumer(grok.GlobalUtility):
                                      callback=self.on_queue_bound)
 
     def on_queue_bound(self, frame, index=0):
-        logger.info(("Consumer bound queue '%s' to exchange '%s' "
-                     "on connection '%s'"),
-                    self._queue, self.exchange, self.connection_id)
+        logger.default(u"Consumer bound queue '%s' to exchange '%s' "
+                       u"on connection '%s'",
+                       self._queue, self.exchange, self.connection_id)
         if type(self.routing_key) not in (tuple, list):
             self.on_ready_to_consume()
         elif len(self.routing_key) <= index + 1:
@@ -254,8 +255,8 @@ class Consumer(grok.GlobalUtility):
 
     def on_ready_to_consume(self):
         if self.marker is not None:  # False is allowed to trigger consuming
-            logger.info("Consumer ready to consume queue '%s' on "
-                        "connection '%s'", self._queue, self.connection_id)
+            logger.default(u"Consumer ready to consume queue '%s' on "
+                           u"connection '%s'", self._queue, self.connection_id)
             self._channel.basic_consume(self.on_message_received,
                                         queue=self._queue)
 
@@ -346,6 +347,11 @@ class ConsumingView(BrowserView):
         routing_key = message.method_frame.routing_key
         delivery_tag = message.method_frame.delivery_tag
 
+        age = unicode(datetime.datetime.utcnow() - message.created_datetime)
+        logger.default(u"Worker started processing message '%s' "
+                       u"(status = '%s', age = '%s')",
+                       delivery_tag, message.state, age)
+
         message._register()
         event = createObject('AMQPMessageArrivedEvent', message)
 
@@ -353,8 +359,8 @@ class ConsumingView(BrowserView):
             try:
                 notify(event)
             except ConflictError:
-                logger.error(("Conflict while working on message '%s' "
-                              "(status = '%s')"),
+                logger.error(u"Conflict while working on message '%s' "
+                             u"(status = '%s')",
                              delivery_tag, message.state)
                 message.state = "ERROR"
                 raise
@@ -364,20 +370,21 @@ class ConsumingView(BrowserView):
                 if err_handler is not None:
                     err_handler(message, exc_value, exc_traceback)
                 else:
-                    logger.error(("Error while handling message '%s' sent to "
-                                  "exchange '%s' with routing key '%s'"),
+                    logger.error(u"Error while handling message '%s' sent to "
+                                 u"exchange '%s' with routing key '%s'",
                                  delivery_tag, exchange, routing_key)
                     message.state = "ERROR"
                     raise
 
+        age = unicode(datetime.datetime.utcnow() - message.created_datetime)
         if not (message.acknowledged or message.rejected):
-            logger.warning(("Nobody acknowledged or rejected message '%s' "
-                            "sent to exchange exchange '%s' "
-                            "with routing key '%s'"),
+            logger.warning(u"Nobody acknowledged or rejected message '%s' "
+                           u"sent to exchange exchange '%s' "
+                           u"with routing key '%s'",
                            delivery_tag, exchange, routing_key)
         else:
-            logger.debug(("Letting Zope to commit database transaction for "
-                          u"message '%s' (status = '%s')"),
-                         delivery_tag, message.state)
+            logger.default(u"Letting Zope to commit database transaction for "
+                           u"message '%s' (status = '%s', age = '%s')",
+                           delivery_tag, message.state, age)
 
         return u''  # 200 No Content

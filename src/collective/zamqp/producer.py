@@ -179,8 +179,8 @@ class Producer(grok.GlobalUtility, VTM):
         if self._connection:
             self._connection.add_on_channel_open_callback(self.on_channel_open)
         else:
-            logger.warning(("Connection '%s' was not registered. "
-                            "Producer '%s' cannot be connected."),
+            logger.warning(u"Connection '%s' was not registered. "
+                           u"Producer '%s' cannot be connected.",
                            self.connection_id, self.routing_key)
 
     def on_channel_open(self, channel):
@@ -203,8 +203,8 @@ class Producer(grok.GlobalUtility, VTM):
                                        callback=self.on_exchange_declared)
 
     def on_exchange_declared(self, frame):
-        logger.info("Producer declared exchange '%s' on connection '%s'",
-                    self.exchange, self.connection_id)
+        logger.default(u"Producer declared exchange '%s' on connection '%s'",
+                       self.exchange, self.connection_id)
         if self.queue_auto_declare and self.queue is not None\
                 and not self.queue.startswith('amq.'):
             self.declare_queue()
@@ -221,8 +221,8 @@ class Producer(grok.GlobalUtility, VTM):
 
     def on_queue_declared(self, frame):
         self._queue = frame.method.queue  # get the real queue name
-        logger.info("Producer declared queue '%s' on connection '%s'",
-                    self._queue, self.connection_id)
+        logger.default(u"Producer declared queue '%s' on connection '%s'",
+                       self._queue, self.connection_id)
         if self.auto_declare and self.exchange:
             self.bind_queue()
         else:
@@ -234,15 +234,15 @@ class Producer(grok.GlobalUtility, VTM):
                                  callback=self.on_queue_bound)
 
     def on_queue_bound(self, frame):
-        logger.info(("Producer bound queue '%s' to exchange '%s' "
-                     "on connection '%s'"),
-                    self._queue, self.exchange, self.connection_id)
+        logger.default(u"Producer bound queue '%s' to exchange '%s' "
+                       u"on connection '%s'",
+                       self._queue, self.exchange, self.connection_id)
         self.on_ready_to_publish()
 
     def on_ready_to_publish(self):
-        logger.info(("Producer ready to publish to exchange '%s' "
-                     "with routing key '%s' on connection '%s'"),
-                    self.exchange, self.routing_key, self.connection_id)
+        logger.default(u"Producer ready to publish to exchange '%s' "
+                       u"with routing key '%s' on connection '%s'",
+                       self.exchange, self.routing_key, self.connection_id)
         self._callbacks.process(0, "_on_ready_to_publish", self)
 
     @property
@@ -326,8 +326,9 @@ class Producer(grok.GlobalUtility, VTM):
             return True
 
         elif self.durable:
-            logger.warning(('No connection. Durable message will be left to '
-                            'wait for the new connection: %s'), kwargs)
+            logger.warning(u"No connection. Durable message was left into "
+                           u"volatile memory to wait for a new connection "
+                           u"'%s'", kwargs)
             retry_callback = retry_constructor(self._basic_publish, kwargs)
             with self._lock:
                 self._callbacks.add(0, '_on_ready_to_publish', retry_callback)
@@ -340,7 +341,7 @@ class Producer(grok.GlobalUtility, VTM):
                 and getattr(self, '_channel', None):
             self._channel.tx_commit()
         else:
-            logger.warning('No connection. Tx.Commit could not be sent.')
+            logger.warning(u'No connection. Tx.Commit was not sent')
 
     def _begin(self):
         self._pending_messages = []

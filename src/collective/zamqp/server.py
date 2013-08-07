@@ -36,14 +36,16 @@ from zope.interface import implements
 from zope.component import\
     getUtility, provideUtility, getUtilitiesFor, provideHandler
 
-from collective.zamqp import logger
-from collective.zamqp import loglevel
 from collective.zamqp.interfaces import\
     IBrokerConnection, IBeforeBrokerConnectEvent,\
     IConsumer, IConsumingRequest
 
+from collective.zamqp import logger
 
-class LogHelper:
+
+class AMQPMedusaLogger:
+    """Simple Medusa compatible logger wrapper
+    """
     def __init__(self, logger):
         self.logger = logger
 
@@ -51,8 +53,9 @@ class LogHelper:
         self.logger.log(ip + ' ' + msg)
 
 
-class DummyChannel:
-    # we need this minimal do-almost-nothing channel class to appease medusa
+class AMQPMedusaChannel:
+    """Dummy medusa channel
+    """
     addr = ['127.0.0.1']
     closed = 1
 
@@ -98,6 +101,14 @@ class ConsumingServer(object):
                  scheme='http', hostname=None, port=80, use_vhm=True,
                  logger=None, handler=None):
 
+        self.logger = AMQPMedusaLogger(logger)
+
+        from collective.zamqp import logger
+        logger.default(
+            u"AMQP Consuming Server for connection '%s' started "
+            u"(site '%s' user: '%s')",
+            connection_id, site_id, user_id)
+
         self._USE_VHM = use_vhm
 
         h = self.headers = []
@@ -110,17 +121,6 @@ class ConsumingServer(object):
         else:
             h.append('Host: {0:s}:{1:d}'.format(hostname, port))
 
-        # XXX: This is from ZopeClockServer, do we need that?
-        self.logger = LogHelper(logger)
-        self.log(("AMQP Consuming Server for connection '%s' started "
-                  "(site '%s' user: '%s')")
-                 % (connection_id, site_id, user_id))
-
-        if handler is None:
-            # for unit testing
-            handler = handle
-        self.zhandler = handler
-
         self.hostname = hostname
         self.connection_id = connection_id
         self.site_id = site_id
@@ -128,19 +128,14 @@ class ConsumingServer(object):
         self.port = port
         self.scheme = scheme
 
+        if handler is None:
+            # for unit testing
+            handler = handle
+        self.zhandler = handler
+
         self.consumers = []
         provideHandler(self.on_before_broker_connect,
                        [IBeforeBrokerConnectEvent])
-
-    # log and log_info may be overridden to provide more sophisticated
-    # logging and warning methods. In general, log is for 'hit' logging
-    # and 'log_info' is for informational, warning and error logging.
-
-    def log_error(self, message):
-        logger.error(message)
-
-    def log(self, message, type=None):
-        logger.log(loglevel, message)
 
     def get_requests_and_response(self, message):
         # All ZAMQP-requests are send to the same 'zamqp-consumer'-view. To
@@ -171,7 +166,7 @@ class ConsumingServer(object):
 
         out = StringIO.StringIO()
         s_req = '%s %s HTTP/%s' % ('GET', method, '1.0')
-        req = http_request(DummyChannel(self), s_req, 'GET', method,
+        req = http_request(AMQPMedusaChannel(self), s_req, 'GET', method,
                            '1.0', self.headers)
         env = self.get_env(req)
         resp = make_response(req, env)
@@ -280,9 +275,10 @@ class ConsumingServer(object):
                              self.on_message_received)
 
     def on_message_received(self, message):
-        self.log(("Received message '%s' sent to exchange '%s' with "
-                  "routing key '%s'") % (message.method_frame.delivery_tag,
-                                         message.method_frame.exchange,
-                                         message.method_frame.routing_key))
+        logger.default(u"Received message '%s' sent to exchange '%s' with "
+                       u"routing key '%s'",
+                       message.method_frame.delivery_tag,
+                       message.method_frame.exchange,
+                       message.method_frame.routing_key)
         req, zreq, resp = self.get_requests_and_response(message)
         self.zhandler('Zope2', zreq, resp)

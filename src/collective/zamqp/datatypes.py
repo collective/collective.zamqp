@@ -61,6 +61,10 @@ class BrokerConnectionFactory(object):
                                       prefetch_count=self.prefetch_count,
                                       tx_select=self.tx_select)
 
+        # set expected ZServer-properties to support debugtoolbar
+        connection.server_name = "ZAMQP Broker Connection"
+        connection.ip = None
+
         provideUtility(connection, IBrokerConnection, name=self.connection_id)
 
         if self.keepalive:
@@ -151,11 +155,15 @@ class ConsumingServerFactory(object):
         from collective.zamqp.server import ConsumingServer
         from ZServer.AccessLogger import access_logger
 
-        return ConsumingServer(self.connection_id,
-                               self.site_id,
-                               self.user_id,
-                               self.scheme,
-                               self.hostname,
-                               self.port,
-                               self.use_vhm,
-                               access_logger)
+        server = ConsumingServer(self.connection_id,
+                                self.site_id,
+                                self.user_id,
+                                self.scheme,
+                                self.hostname,
+                                self.port,
+                                self.use_vhm,
+                                access_logger)
+        # set expected ZServer-properties to support debugtoolbar
+        server.server_name = "ZAMQP Consuming Server"
+        server.ip = server.port = None
+        return server

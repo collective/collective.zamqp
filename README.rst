@@ -110,7 +110,7 @@ Explanation of configuration parameters
 
 - amqp-consuming-server
 
-  ``connectin_id``
+  ``connection_id``
         The name of a global utility providing configured IBrokerConnection. A
         consuming server will serve consumers registered for its connection id
         only.

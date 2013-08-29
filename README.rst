@@ -24,7 +24,7 @@ TODO
 
 While we are still documenting and testing **collective.zamqp**,
 you may want to take a look at `collective.zamqpdemo
-<http://github.com/collective/collective.zamqpdemo/>`_ for an example of use.
+<http://github.com/datakurre/collective.zamqpdemo/>`_ for an example of use.
 
 
 Installation

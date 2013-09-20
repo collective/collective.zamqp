@@ -165,5 +165,5 @@ class ConsumingServerFactory(object):
                                 access_logger)
         # set expected ZServer-properties to support debugtoolbar
         server.server_name = "ZAMQP Consuming Server"
-        server.ip = server.port = None
+        server.ip = None
         return server

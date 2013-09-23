@@ -137,7 +137,7 @@ class ConsumingServerFactory(object):
         self.port = section.port
         self.scheme = section.scheme
         self.use_vhm = section.use_vhm
-        self.vhm_site_url = section.vhm_site_url
+        self.vhm_method_prefix = section.vhm_method_prefix
 
         # Just in case, mimic ZServer.datatypes.ServerFactory
         self.ip = None
@@ -163,7 +163,7 @@ class ConsumingServerFactory(object):
                                  self.hostname,
                                  self.port,
                                  self.use_vhm,
-                                 self.vhm_site_url,
+                                 self.vhm_method_prefix,
                                  access_logger)
         # set expected ZServer-properties to support debugtoolbar
         server.server_name = "ZAMQP Consuming Server"

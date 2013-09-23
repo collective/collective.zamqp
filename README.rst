@@ -134,10 +134,13 @@ Explanation of configuration parameters
        Create VirtualHostMonster-wrapped method calls when hostname is set. VHM
        is used to tell portal the configured real public hostname and to hide
        portal's id from path. Defaults to *on* when *hostname* is given.
-  ``vhm_site_url`` (optional)
-       Explicitly set the VHM url for the site. The url will prefix the AMQP
-       method paths so that VHM can tell portal the configured real public
-       hostname and path.
+  ``vhm_method_prefix`` (optional)
+       Explicitly set the VHM method prefix for AMQP-based requests. Most
+       typical options may look like:
+
+       * /VirtualHostBase/https/example.com:443/Plone
+       * /VirtualHostBase/https/example.com:443/Plone/VirtualHostRoot
+       * /VirtualHostBase/https/example.com:443/Plone/VirtualHostRoot/_vh_subsite
 
        Note: This overrides the default implicit VHM-support by setting scheme,
        hostname, port and use_vhm, but will still require use_vhm enabled to be

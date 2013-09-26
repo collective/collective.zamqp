@@ -245,11 +245,16 @@ class ConsumingServer(object):
                           'durable',
                           'exchange_type',
                           'exchange_durable',
+                          'exchange_auto_delete',
+                          'exchange_auto_declare',
                           'queue',
                           'queue_durable',
+                          'queue_auto_delete',
                           'queue_exclusive',
                           'queue_arguments',
+                          'queue_auto_declare',
                           'auto_declare',
+                          'auto_delete',
                           'auto_ack',
                           'marker']
                 clonedConsumerUtility = consumerUtility.__class__(

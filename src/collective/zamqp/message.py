@@ -79,22 +79,24 @@ class Message(object, VTM):
     @property
     def body(self):
         if self._deserialized_body is _EMPTY_MARKER:
-            # de-serializer body when its content_type is supported
+            # Read content_type from message:
             content_type = getattr(self.header_frame, 'content_type', None)
             # XXX: Sometimes must go deeper to find the content_type
             if content_type is None:
                 content_type = (
                     getattr(self.header_frame, 'headers', None) or {}
-                ).get('properties', {}).get('content_type', {})
-            util = queryUtility(ISerializer, name=content_type)
-            if util:
-                self._deserialized_body =\
-                    util.deserialize(self._serialized_body)
+                ).get('properties', {}).get('content_type')
+            # De-serializer body when its content_type is supported:
+            if content_type:
+                util = queryUtility(ISerializer, name=content_type)
+                if util:
+                    self._deserialized_body =\
+                        util.deserialize(self._serialized_body)
 
         if self._deserialized_body is not _EMPTY_MARKER:
             return self._deserialized_body
-
-        return self._serialized_body
+        else:
+            return self._serialized_body
 
     def ack(self):
         """Mark the message as acknowledged.

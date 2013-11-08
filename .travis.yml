@@ -4,7 +4,6 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install rabbitmq-server
 install:
-  - mkdir -p buildout-cache/eggs
   - mkdir -p buildout-cache/downloads
   - python bootstrap.py -c travis.cfg
   - bin/buildout -N -t 3 -c travis.cfg

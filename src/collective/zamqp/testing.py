@@ -209,13 +209,6 @@ class ZAMQP(Layer):
                                     use_vhm=False)
                 consuming_servers.append(consumer.connection_id)
 
-            # generate default producer with the name of the connection
-            producer = Producer(connection.connection_id, exchange="",
-                                routing_key="", durable=False,
-                                auto_declare=False)
-            sm.registerUtility(producer, provided=IProducer,
-                               name=connection.connection_id)
-
         # Connect all connections
 
         from collective.zamqp import connection

@@ -116,6 +116,10 @@ class BrokerConnectionFactory(object):
                                 auto_declare=False)
             provideUtility(producer, IProducer, name=self.connection_id)
 
+        # set expected ZServer-properties to support debugtoolbar
+        connection.server_name = "ZAMQP Broker Connection"
+        connection.ip = None
+
         return connection
 
 
@@ -165,7 +169,9 @@ class ConsumingServerFactory(object):
                                  self.use_vhm,
                                  self.vhm_method_prefix,
                                  access_logger)
+
         # set expected ZServer-properties to support debugtoolbar
         server.server_name = "ZAMQP Consuming Server"
         server.ip = None
+
         return server

@@ -4,8 +4,8 @@ Changelog
 0.13.2 (unreleased)
 -------------------
 
-- Nothing changed yet.
-
+- Remove duplicate default producer from test fixture.
+  [Asko Soukka]
 
 0.13.1 (2013-11-08)
 -------------------

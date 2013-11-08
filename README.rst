@@ -133,7 +133,7 @@ Explanation of configuration parameters
   ``use_vhm`` (optional)
        Create VirtualHostMonster-wrapped method calls when hostname is set. VHM
        is used to tell portal the configured real public hostname and to hide
-       portal's id from path. Defaults to *on* when *hostname* is given.
+       portal's id from path. Defaults to *on*.
   ``vhm_method_prefix`` (optional)
        Explicitly set the VHM method prefix for AMQP-based requests. Most
        typical options may look like:

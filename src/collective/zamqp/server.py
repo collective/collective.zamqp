@@ -99,7 +99,7 @@ class ConsumingServer(object):
 
     def __init__(self, connection_id, site_id, user_id='Anonymous User',
                  scheme='http', hostname=None, port=80, use_vhm=True,
-                 logger=None, handler=None):
+                 vhm_method_prefix='', logger=None, handler=None):
 
         self.logger = AMQPMedusaLogger(logger)
 
@@ -127,6 +127,7 @@ class ConsumingServer(object):
         self.user_id = user_id
         self.port = port
         self.scheme = scheme
+        self.vhm_method_prefix = vhm_method_prefix
 
         if handler is None:
             # for unit testing
@@ -147,7 +148,11 @@ class ConsumingServer(object):
         correlation_id = getattr(message.header_frame, 'correlation_id', '')
 
         _params = (exchange, routing_key)
-        if self._USE_VHM:
+        if self._USE_VHM and self.vhm_method_prefix:
+            _method = \
+                self.vhm_method_prefix + \
+                "/@@zamqp-consumer/{self.connection_id}/{0}/{1}"
+        elif self._USE_VHM:
             _method = \
                 "/VirtualHostBase" + \
                 "/{self.scheme}/{self.hostname}:{self.port}/{self.site_id}" + \

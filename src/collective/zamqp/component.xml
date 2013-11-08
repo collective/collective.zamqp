@@ -107,8 +107,22 @@
      <key name="use_vhm" datatype="boolean" default="on">
        <description>
        Create VirtualHostMonster-wrapped method calls when hostname is set. VHM
-       is used to tell portal the configured real public hostname and  to hide
+       is used to tell portal the configured real public hostname and to hide
        portal's id from path.
+       </description>
+     </key>
+     <key name="vhm_method_prefix" datatype="string" default="">
+       <description>
+       Explicitly set the VHM method prefix for AMQP-based requests. Most
+       typical options may look like:
+
+       * /VirtualHostBase/https/example.com:443/Plone
+       * /VirtualHostBase/https/example.com:443/Plone/VirtualHostRoot
+       * /VirtualHostBase/https/example.com:443/Plone/VirtualHostRoot/_vh_subsite
+
+       Note: This overrides the default implicit VHM-support by setting scheme,
+       hostname, port and use_vhm, but will still require use_vhm enabled to be
+       active. Empty value fallbacks to the old default use_vhm-behavior.
        </description>
      </key>
      <key name="override_lifetime_loop" datatype="boolean" default="on">

@@ -4,7 +4,8 @@ Changelog
 0.13.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Remove hard dependency to z3c.unconfigure 1.0.1.
+  [saily]
 
 
 0.13.2 (2013-11-08)

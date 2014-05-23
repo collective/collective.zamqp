@@ -58,6 +58,5 @@ setup(
         'grokcore.component',
         'pika == 0.9.5',  # pika > 0.9.5 will require review and fixes
         'zope.deprecation',
-        'z3c.unconfigure==1.0.1',  # BBB (for sauna.reload)
     ]
 )

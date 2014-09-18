@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.14.0rc1 (unreleased)
+0.14.0rc1 (2014-09-18)
 ----------------------
 
 - Fix issue where language is not correctly set for AMQP requests

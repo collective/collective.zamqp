@@ -1,12 +1,13 @@
 Changelog
 =========
 
-0.13.3 (unreleased)
+0.14.0 (unreleased)
 -------------------
 
-- Remove hard dependency to z3c.unconfigure 1.0.1.
-  [saily]
-
+- Fix issue where language is not correctly set for AMQP requests
+  [Asko Soukka]
+- Remove hard dependency to z3c.unconfigure 1.0.1
+  [Daniel Widerin]
 
 0.13.2 (2013-11-08)
 -------------------

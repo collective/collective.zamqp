@@ -20,6 +20,13 @@
         handler=".connection.connect_all"
         />
 
+    <subscriber
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot
+             zope.traversing.interfaces.IBeforeTraverseEvent"
+        handler=".handlers.setLanguageBindings"
+        zcml:condition="installed Products.CMFPlone" />
+        />
+
     <include package="zope.browserpage" file="meta.zcml"
              zcml:condition="installed zope.browserpage" />
 

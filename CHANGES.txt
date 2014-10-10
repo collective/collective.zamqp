@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.14.1 (unreleased)
+0.14.1 (2014-10-10)
 -------------------
 
 - Fix issue where logging reject did not get enough arguments

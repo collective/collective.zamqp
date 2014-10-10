@@ -155,7 +155,7 @@ class Message(object, VTM):
 
         age = unicode(datetime.datetime.utcnow() - self.created_datetime)
         logger.default(u"Rejected message '%s' (status = '%s', age = '%s')",
-                       self.method_frame.delivery_tag, self.state)
+                       self.method_frame.delivery_tag, self.state, age)
 
     def _abort(self):
         # collect execution info for guessing the reason for abort

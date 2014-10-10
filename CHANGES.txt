@@ -4,8 +4,8 @@ Changelog
 0.14.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
-
+- Fix issue where logging reject did not get enough arguments
+  [Asko Soukka]
 
 0.14.0 (2014-09-18)
 -------------------

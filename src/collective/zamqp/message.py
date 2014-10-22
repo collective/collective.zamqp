@@ -23,7 +23,7 @@ from zope.interface import implements, implementedBy
 from zope.component import IFactory, queryUtility
 from zope.component.interfaces import ObjectEvent
 
-from collective.zamqp import logger
+from collective.zamqp.utils import logger
 from collective.zamqp.interfaces import\
     IMessage, IMessageArrivedEvent, ISerializer
 from collective.zamqp.transactionmanager import VTM

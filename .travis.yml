@@ -3,6 +3,7 @@ python: "2.7"
 before_install:
 - sudo apt-get update
 - sudo apt-get install rabbitmq-server
+- echo `which rabbitmq-server`
 install:
 - virtualenv test-env --no-setuptools
 - mkdir -p buildout-cache/downloads

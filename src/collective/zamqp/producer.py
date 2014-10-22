@@ -18,7 +18,7 @@ import grokcore.component as grok
 
 from zope.component import getUtility, queryUtility, provideHandler
 
-from collective.zamqp import logger
+from collective.zamqp.utils import logger
 from collective.zamqp.interfaces import\
     IProducer, IBrokerConnection, IBeforeBrokerConnectEvent, ISerializer
 from collective.zamqp.transactionmanager import VTM

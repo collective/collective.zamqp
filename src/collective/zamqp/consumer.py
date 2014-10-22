@@ -37,7 +37,7 @@ except ImportError:  # BBB
 
 from Products.Five.browser import BrowserView
 
-from collective.zamqp import logger
+from collective.zamqp.utils import logger
 from collective.zamqp.interfaces import IConsumer, IErrorHandler
 from collective.zamqp.connection import BlockingChannel
 

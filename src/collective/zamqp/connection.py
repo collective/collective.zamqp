@@ -32,7 +32,7 @@ from pika.adapters.asyncore_connection import\
 from pika.callback import CallbackManager
 from pika.simplebuffer import SimpleBuffer
 
-from collective.zamqp import logger
+from collective.zamqp.utils import logger
 from collective.zamqp.interfaces import\
     IBrokerConnection, IBeforeBrokerConnectEvent
 

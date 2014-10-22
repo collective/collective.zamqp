@@ -40,7 +40,7 @@ from collective.zamqp.interfaces import\
     IBrokerConnection, IBeforeBrokerConnectEvent,\
     IConsumer, IConsumingRequest
 
-from collective.zamqp import logger
+from collective.zamqp.utils import logger
 
 
 class AMQPMedusaLogger:

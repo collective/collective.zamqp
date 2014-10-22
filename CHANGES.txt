@@ -4,8 +4,8 @@ Changelog
 0.14.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
-
+- Log connection and channel creation etc.
+  [sunew]
 
 0.14.2 (2014-10-23)
 -------------------
@@ -26,7 +26,7 @@ Changelog
 - Fix issue where language is not correctly set for AMQP requests
   [datakurre]
 - Remove hard dependency to z3c.unconfigure 1.0.1
-  [Daniel Widerin]
+  [saily]
 
 0.13.2 (2013-11-08)
 -------------------

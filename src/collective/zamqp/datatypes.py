@@ -68,6 +68,10 @@ class BrokerConnectionFactory(object):
         provideUtility(connection, IBrokerConnection, name=self.connection_id)
 
         if self.keepalive:
+            from collective.zamqp.utils import logger
+            logger.default(u"Setting up keepalive (%s s) for connection '%s'",
+                           self.keepalive, self.connection_id)
+
             # register a ping producer, a ping consumer, a ping view and a ping
             # clock-server to keep the connection alive
 

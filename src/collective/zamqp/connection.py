@@ -290,7 +290,27 @@ class BrokerConnection(grok.GlobalUtility):
                            ('Connection.userid is no more. '
                             'Please, use Connection.username instead.'))
 
+        logger.default(u"AMQP Broker connection '%s' created. "
+                       u"hostname: '%s', "
+                       u"port: '%s', "
+                       u"virtual_host: '%s', "
+                       u"username: '%s', "
+                       u"heartbeat: '%s', "
+                       u"prefetch_count: '%s', "
+                       u"tx_select: '%s'",
+                       self.connection_id,
+                       self.hostname,
+                       self.port,
+                       self.virtual_host,
+                       self.username,
+                       self.heartbeat,
+                       self.prefetch_count,
+                       self.tx_select)
+
+
     def connect(self):
+        logger.default(u"Connection '%s' connecting",
+                       self.connection_id)
         credentials = PlainCredentials(
             self.username, self.password, erase_on_connect=False)
         parameters = ConnectionParameters(
@@ -323,11 +343,15 @@ class BrokerConnection(grok.GlobalUtility):
         self._callbacks.add(0, '_on_channel_open', callback, False)
 
     def on_connect(self, connection):
+        logger.default(u"Connection '%s' connected",
+                       self.connection_id)
         self._connection = connection
         self._connection.channel(self.on_channel_open)
         self._reconnection_delay = 1.0
 
     def on_channel_open(self, channel):
+        logger.default(u"Channel for connection '%s' opened",
+                       self.connection_id)
         self._channel = channel
         self._channel.add_on_close_callback(self.on_channel_closed)
 

@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.14.3 (unreleased)
+0.14.3 (2014-10-23)
 -------------------
 
 - Log connection and channel creation etc.

@@ -2,7 +2,7 @@ language: python
 python: "2.7"
 before_install:
 - sudo apt-get update
-- sudo apt-get install rabbitmq-server
+- sudo apt-get install xsltproc
 install:
 - virtualenv test-env --no-setuptools
 - mkdir -p buildout-cache/downloads

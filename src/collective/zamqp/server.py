@@ -103,7 +103,7 @@ class ConsumingServer(object):
 
         self.logger = AMQPMedusaLogger(logger)
 
-        from collective.zamqp import logger
+        from collective.zamqp.utils import logger
         logger.default(
             u"AMQP Consuming Server for connection '%s' started "
             u"(site '%s' user: '%s')",

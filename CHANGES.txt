@@ -4,20 +4,21 @@ Changelog
 0.14.2 (unreleased)
 -------------------
 
-- Nothing changed yet.
-
+- The ZAMQP_LOGLEVEL environment variable was not yet accessible at import
+  time. Moved Logger to utils module to delay the import.
+  [sunew]
 
 0.14.1 (2014-10-10)
 -------------------
 
 - Fix issue where logging reject did not get enough arguments
-  [Asko Soukka]
+  [datakurre]
 
 0.14.0 (2014-09-18)
 -------------------
 
 - Fix issue where language is not correctly set for AMQP requests
-  [Asko Soukka]
+  [datakurre]
 - Remove hard dependency to z3c.unconfigure 1.0.1
   [Daniel Widerin]
 
@@ -25,7 +26,7 @@ Changelog
 -------------------
 
 - Remove duplicate default producer from test fixture.
-  [Asko Soukka]
+  [datakurre]
 
 0.13.1 (2013-11-08)
 -------------------
@@ -36,7 +37,7 @@ Changelog
 -------------------
 
 - Add vhm_method_prefix-option to replace old vhm-options
-  [Asko Soukka]
+  [datakurre]
 
 0.12.0 (2013-08-08)
 -------------------

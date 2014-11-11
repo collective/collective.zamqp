@@ -82,6 +82,10 @@ class VTM:
 
     tpc_abort = abort
 
+    def savepoint(self):
+        from transaction._transaction import NoRollbackSavepoint
+        return NoRollbackSavepoint(self)
+
     def sortKey(self, *ignored):
         return '~zamqp'
 

@@ -4,6 +4,13 @@ Changelog
 0.15.0 (unreleased)
 -------------------
 
+- **Important** This release changes producers and messages to join
+  the current transaction using 'join' instead of 'register'. This is
+  should be fully backwards compatible, but requires more testing for
+  possible side-effects.
+
+- Fix to join transaction using join instead of register to support savepoints
+  [Asko Soukka]
 - Add minimal savepoint support (NoRollbackSavepoint)
   [Asko Soukka]
 

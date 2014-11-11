@@ -44,7 +44,7 @@ class VTM:
     def _register(self):
         if not self._v_registered:
             try:
-                transaction.get().register(Surrogate(self))
+                transaction.get().join(self)
                 self._begin()
                 self._v_registered = 1
                 self._v_finalize = 0
@@ -83,8 +83,7 @@ class VTM:
     tpc_abort = abort
 
     def savepoint(self):
-        from transaction._transaction import NoRollbackSavepoint
-        return NoRollbackSavepoint(self)
+        return transaction._transaction.NoRollbackSavepoint(self)
 
     def sortKey(self, *ignored):
         return '~zamqp'

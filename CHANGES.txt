@@ -1,11 +1,11 @@
 Changelog
 =========
 
-0.14.4 (unreleased)
+0.15.0 (unreleased)
 -------------------
 
-- Nothing changed yet.
-
+- Add minimal savepoint support (NoRollbackSavepoint)
+  [Asko Soukka]
 
 0.14.3 (2014-10-23)
 -------------------

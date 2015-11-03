@@ -15,8 +15,9 @@ class RabbitFunctional(unittest.TestCase):
 
     def _testNoQueues(self):
         rabbitctl = self.layer['rabbitctl']
-        self.assertEqual('\n'.join(rabbitctl('list_queues')),
-                         'Listing queues ...\n...done.\n\n')
+        self.assertIn('\n'.join(rabbitctl('list_queues')),
+                      ['Listing queues ...\n...done.\n\n',
+                       'Listing queues ...\n\n'])
 
     def testNoQueues(self):
         runAsyncTest(self._testNoQueues)
@@ -58,7 +59,7 @@ class ZAMQPFunctional(unittest.TestCase):
         producer.publish("Hello world!")
 
         runAsyncTest(self._testPublishToQueue)
-        runAsyncTest(self._testPublishToQueueAndConsumeIt)
+        runAsyncTest(self._testPublishToQueueAndConsumeIt, loop_count=10)
 
         # from zope.testing.loggingsupport import InstalledHandler
         # handler = InstalledHandler("collective.zamqp")

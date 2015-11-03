@@ -8,16 +8,13 @@
 ###
 """Test fixtures"""
 
-import asyncore
-
-from zope.configuration import xmlconfig
-
+import os
 from plone.testing import Layer, z2
-
-from rabbitfixture.server import (
-    RabbitServer,
-    RabbitServerResources
-)
+from rabbitfixture.server import RabbitServer
+from rabbitfixture.server import RabbitServerResources
+from tempfile import mktemp
+from zope.configuration import xmlconfig
+import asyncore
 
 
 def runAsyncTest(testMethod, timeout=100, loop_timeout=0.1, loop_count=1):
@@ -50,8 +47,18 @@ class Rabbit(Layer):
     def setUp(self):
         # setup a RabbitMQ
         config = FixedHostname()
+
+        # rabbitfixture does not set enabled plugins file
+        self['enabled_plugins'] = mktemp()
+        with open(self['enabled_plugins'], 'w') as fp:
+            fp.write('[].')
+        self['RABBITMQ_ENABLED_PLUGINS_FILE'] = os.environ.get(
+            'RABBITMQ_ENABLED_PLUGINS_FILE')
+        os.environ['RABBITMQ_ENABLED_PLUGINS_FILE'] = self['enabled_plugins']
+
         self['rabbit'] = RabbitServer(config=config)
         self['rabbit'].setUp()
+
         # define a shortcut to rabbitmqctl
         self['rabbitctl'] = self['rabbit'].runner.environment.rabbitctl
 
@@ -69,6 +76,15 @@ class Rabbit(Layer):
                 pass
             else:
                 raise
+
+        # rabbitfixture does not set enabled plugins file
+        if self['RABBITMQ_ENABLED_PLUGINS_FILE'] is None:
+            os.environ.pop('RABBITMQ_ENABLED_PLUGINS_FILE')
+        else:
+            os.environ['RABBITMQ_ENABLED_PLUGINS_FILE'] = \
+                self['RABBITMQ_ENABLED_PLUGINS_FILE']
+        os.unlink(self['enabled_plugins'])
+
 
 RABBIT_FIXTURE = Rabbit()
 

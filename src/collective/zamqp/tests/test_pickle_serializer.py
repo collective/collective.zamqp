@@ -54,7 +54,7 @@ class TestPickleSerializer(unittest.TestCase):
         producer.publish({"key": "value"})
 
         runAsyncTest(self._testPublishToQueue)
-        runAsyncTest(self._testPublishToQueueAndConsumeIt)
+        runAsyncTest(self._testPublishToQueueAndConsumeIt, loop_count=10)
         self.l.check(
             ('c.zamqp.tests', 'INFO',
              "<BasicProperties(['delivery_mode=2', "

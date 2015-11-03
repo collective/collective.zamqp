@@ -9,10 +9,15 @@ Changelog
   should be fully backwards compatible, but requires more testing for
   possible side-effects.
 
+- Fix issue where pika blocking connection raised error because of 
+  a bug in its 0.9.5 release
+  [datakurre]
+
 - Fix to join transaction using join instead of register to support savepoints
-  [Asko Soukka]
+  [datakurre]
+
 - Add minimal savepoint support (NoRollbackSavepoint)
-  [Asko Soukka]
+  [datakurre]
 
 0.14.3 (2014-10-23)
 -------------------

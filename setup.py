@@ -31,6 +31,7 @@ setup(
             'testfixtures',
             'rabbitfixture',
             'plone.testing',
+            'plone.app.testing',
             'zope.configuration',
             'msgpack-python',
         ],

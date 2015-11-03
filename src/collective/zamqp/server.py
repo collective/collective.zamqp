@@ -19,28 +19,26 @@
 ###
 """AMQP consuming server, which generates a faux HTTP request for every
 consumed message by adopting the asyncore API"""
-
+from ZPublisher.HTTPRequest import HTTPRequest
+from ZServer.HTTPResponse import make_response
+from ZServer.PubCore import handle
+from ZServer.medusa.default_handler import unquote
+from ZServer.medusa.http_server import http_request
+from collective.zamqp.interfaces import IBeforeBrokerConnectEvent
+from collective.zamqp.interfaces import IBrokerConnection
+from collective.zamqp.interfaces import IConsumer
+from collective.zamqp.interfaces import IConsumingRequest
+from collective.zamqp.utils import logger
+from zope.component import getUtilitiesFor
+from zope.component import getUtility
+from zope.component import provideHandler
+from zope.component import provideUtility
+from zope.interface import implements
+import StringIO
 import os
+import posixpath
 import socket
 import time
-import StringIO
-import posixpath
-
-from ZServer.medusa.http_server import http_request
-from ZServer.medusa.default_handler import unquote
-from ZServer.PubCore import handle
-from ZServer.HTTPResponse import make_response
-from ZPublisher.HTTPRequest import HTTPRequest
-
-from zope.interface import implements
-from zope.component import\
-    getUtility, provideUtility, getUtilitiesFor, provideHandler
-
-from collective.zamqp.interfaces import\
-    IBrokerConnection, IBeforeBrokerConnectEvent,\
-    IConsumer, IConsumingRequest
-
-from collective.zamqp.utils import logger
 
 
 class AMQPMedusaLogger:

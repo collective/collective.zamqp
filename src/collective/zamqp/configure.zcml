@@ -2,7 +2,17 @@
            xmlns:grok="http://namespaces.zope.org/grok"
            xmlns:zcml="http://namespaces.zope.org/zcml"
            xmlns:browser="http://namespaces.zope.org/browser"
+           xmlns:monkey="http://namespaces.plone.org/monkey"
            i18n_domain="collective.zamqp">
+
+    <include package="collective.monkeypatcher" file="meta.zcml" />
+    <monkey:patch
+        description="patch pika 0.9.5 blocking connection module"
+        module="pika.adapters.blocking_connection"
+        original="log"
+        replacement="pika.log"
+        ignoreOriginal="true"
+        />
 
     <include package="grokcore.component" file="meta.zcml"/>
 

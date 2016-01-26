@@ -57,6 +57,7 @@ setup(
         'zope.processlifetime',
         'grokcore.component',
         'pika == 0.9.5',  # pika > 0.9.5 will require review and fixes
+        'collective.monkeypatcher',  # to patch a missing import in pika
         'zope.deprecation',
     ]
 )

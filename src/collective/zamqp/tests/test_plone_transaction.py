@@ -139,7 +139,7 @@ class TestPloneTransaction(unittest.TestCase):
             )
         runAsyncTest(untilConsumed, loop_count=10)
 
-        for i in range(5):
+        for i in range(10):
             self.layer['portal']._p_jar.sync()
             try:
                 self.assertIn('test-folder', self.layer['portal'].objectIds())

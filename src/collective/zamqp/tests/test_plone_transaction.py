@@ -16,6 +16,7 @@ from plone.testing import z2
 from zope.component import getUtility
 from zope.configuration import xmlconfig
 from zope.interface import Interface
+import time
 import transaction
 import unittest2 as unittest
 
@@ -138,8 +139,16 @@ class TestPloneTransaction(unittest.TestCase):
             )
         runAsyncTest(untilConsumed, loop_count=10)
 
-        self.layer['portal']._p_jar.sync()
+        for i in range(5):
+            self.layer['portal']._p_jar.sync()
+            try:
+                self.assertIn('test-folder', self.layer['portal'].objectIds())
+                break
+            except AssertError:
+                # the other thread may need some time to commit the change
+                time.sleep(1)
         self.assertIn('test-folder', self.layer['portal'].objectIds())
+
         self.assertEqual(
             self.layer['portal']['test-folder'].title, u'Hello World!')
         self.assertIn(

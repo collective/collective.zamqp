@@ -144,7 +144,7 @@ class TestPloneTransaction(unittest.TestCase):
             try:
                 self.assertIn('test-folder', self.layer['portal'].objectIds())
                 break
-            except AssertError:
+            except AssertionError:
                 # the other thread may need some time to commit the change
                 time.sleep(1)
         self.assertIn('test-folder', self.layer['portal'].objectIds())

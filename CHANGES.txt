@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.15.0 (unreleased)
+0.15.0 (2016-01-27)
 -------------------
 
 - **Note:** This release changes producers and messages to join the current

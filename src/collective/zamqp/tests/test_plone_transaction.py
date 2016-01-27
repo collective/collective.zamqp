@@ -16,6 +16,7 @@ from plone.testing import z2
 from zope.component import getUtility
 from zope.configuration import xmlconfig
 from zope.interface import Interface
+import collective.zamqp
 import time
 import transaction
 import unittest2 as unittest
@@ -61,12 +62,10 @@ class PloneMessagingLayer(PloneSandboxLayer):
     defaultBases = (PLONE_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
+        self.loadZCML(package=collective.zamqp)
         xmlconfig.string("""\
 <configure xmlns="http://namespaces.zope.org/zope"
-           xmlns:grok="http://namespaces.zope.org/grok"
-           i18n_domain="collective.zamqp">
-
-    <include package="collective.zamqp"/>
+           xmlns:grok="http://namespaces.zope.org/grok">
 
     <grok:grok package="collective.zamqp.tests.test_plone_transaction"/>
 
@@ -139,14 +138,7 @@ class TestPloneTransaction(unittest.TestCase):
             )
         runAsyncTest(untilConsumed, loop_count=10)
 
-        for i in range(10):
-            self.layer['portal']._p_jar.sync()
-            try:
-                self.assertIn('test-folder', self.layer['portal'].objectIds())
-                break
-            except AssertionError:
-                # the other thread may need some time to commit the change
-                time.sleep(1)
+        self.layer['portal']._p_jar.sync()
         self.assertIn('test-folder', self.layer['portal'].objectIds())
 
         self.assertEqual(

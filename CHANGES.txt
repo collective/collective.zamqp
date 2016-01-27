@@ -4,20 +4,24 @@ Changelog
 0.15.0 (unreleased)
 -------------------
 
-- **Important** This release changes producers and messages to join
-  the current transaction using 'join' instead of 'register'. This is
-  should be fully backwards compatible, but requires more testing for
-  possible side-effects.
+- **Note:** This release changes producers and messages to join the current
+  transaction using transaction's ``join`` instead of deprecated ``register``.
+  So far, this change has seem to been fully backwards compatible.
 
-- Fix issue where pika blocking connection raised error because of 
-  a bug in its 0.9.5 release
+- Add minimal savepoint support (NoRollbackSavepoint)
   [datakurre]
 
 - Fix to join transaction using join instead of register to support savepoints
   [datakurre]
 
-- Add minimal savepoint support (NoRollbackSavepoint)
+- Fix issue where pika blocking connection raised error because of
+  a missing log import in its 0.9.5 release
   [datakurre]
+
+- Fix testing integration related issue where ZAMQP fixture left dangling
+  registrations to slow down and cause side-effects for tests
+  [datakurre]
+
 
 0.14.3 (2014-10-23)
 -------------------

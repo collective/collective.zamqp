@@ -1,11 +1,11 @@
 Changelog
 =========
 
-0.15.2 (unreleased)
+0.16.0 (unreleased)
 -------------------
 
-- Nothing changed yet.
-
+- Fix msgpack serializer to encode and decode using 'utf-8' encoding by default
+  [Asko Soukka]
 
 0.15.1 (2016-01-28)
 -------------------

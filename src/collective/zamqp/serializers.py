@@ -16,6 +16,8 @@ from grokcore import component as grok
 
 from collective.zamqp.interfaces import ISerializer
 
+MSGPACK_ENCODING = 'utf-8'
+
 
 class PlainTextSerializer(grok.GlobalUtility):
     grok.provides(ISerializer)
@@ -155,10 +157,10 @@ try:
         content_type = "application/x-msgpack"
 
         def serialize(self, body):
-            return msgpack.packb(body)
+            return msgpack.packb(body, encoding='utf-8')
 
         def deserialize(self, body):
-            return msgpack.unpackb(body)
+            return msgpack.unpackb(body, encoding='utf-8')
 
     class MessagePackSerializerByMimeType(MessagePackSerializer):
         grok.provides(ISerializer)

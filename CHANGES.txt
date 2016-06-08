@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.16.0 (unreleased)
+0.16.0 (2016-06-08)
 -------------------
 
 - Fix msgpack serializer to encode and decode using 'utf-8' encoding by default

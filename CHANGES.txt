@@ -4,14 +4,9 @@ Changelog
 0.16.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
-
-
-0.16.1 (unreleased)
--------------------
-
-- Nothing changed yet.
-
+- Fix issue where blocking connection was unable close channel and connection
+  properly due to bug in Pika 0.9.5
+  [datakurre]
 
 0.16.0 (2016-06-08)
 -------------------

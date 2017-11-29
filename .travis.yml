@@ -1,9 +1,11 @@
 language: python
 python: "2.7"
-sudo: false
+sudo: required
 cache:
   directories:
   - eggs
+before_install:
+  - sudo apt-get -y install erlang-dev
 install:
 - python bootstrap.py -v 1.7.1 -c travis-$PLONE_VERSION.cfg
 - bin/buildout -N -t 3 -c travis-$PLONE_VERSION.cfg annotate

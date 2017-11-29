@@ -421,17 +421,17 @@ class BlockingChannel:
         return self.channel
 
     def __exit__(self, type, value, traceback):
-        # self.channel.close()  # broken in pika 0.9.5
+        from pika import spec
+        self.connection.callbacks.add(
+            self.channel.channel_number,
+            spec.Channel.CloseOk,
+            self.channel.transport._on_rpc_complete
+        )
+        self.channel.close()
         self.connection.close()
 
-        # XXX: Probably due to a bug in channel.close in Pika 0.9.5
-        # the connection is not really closed here. Luckily, the channel
-        # closes and therefore you are safe. Eventually, AMQP heartbeat
-        # timeouts and really closes the connection.
-
-        # TODO: Once pika > 0.9.5 has been released and it's safe to
-        # explicitly close blocking channels, this should be able to be
-        # refactored to pool blocking connections within a thread.
+        # TODO: We should be able to be refactored to pool blocking connections
+        # within a thread.
 
 
 class BeforeBrokerConnectEvent(object):

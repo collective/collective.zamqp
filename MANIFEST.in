@@ -1,4 +1,5 @@
-recursive-include src *
-recursive-include docs *
+graft sphinx
+graft src
+graft docs
 include *
 global-exclude *.pyc

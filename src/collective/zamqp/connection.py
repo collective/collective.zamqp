@@ -199,6 +199,7 @@ class AsyncoreConnection(AsyncoreConnectionBase):
         super(AsyncoreConnection, self)._init_connection_state()
         # Enable our custom locking (thread-safe) buffer
         self.outbound_buffer = LockingSimpleBuffer()
+        self._buffer = ''
 
 
 class BrokerConnection(grok.GlobalUtility):

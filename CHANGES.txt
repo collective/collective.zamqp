@@ -4,8 +4,15 @@ Changelog
 0.16.2 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Fix issue where connection delay did not increment due to routing
+  configuration error causing disconnection whiles still configuring
+  exchanges, queues or bindings
+  [datakurre]
 
+- Fix issue where a automatic reconnection caused extra connection to be
+  made, sometimes resulting in wrong delivery tags on consumed messages,
+  leading to precondition failed errors when acking those messages
+  [datakurre]
 
 0.16.1 (2017-11-29)
 -------------------

@@ -376,7 +376,7 @@ class BrokerConnection(grok.GlobalUtility):
         logger.warning(u"Channel closed with reason '%s %s'",
                        code, text)
         self._connection.close(code, text)
-        self.reconnect()
+        self._connection._adapter_disconnect()
 
     def on_channel_tx_select(self, frame):
         self._callbacks.process(0, '_on_channel_open', self, self._channel)

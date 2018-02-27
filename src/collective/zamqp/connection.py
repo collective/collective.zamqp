@@ -199,6 +199,7 @@ class AsyncoreConnection(AsyncoreConnectionBase):
         super(AsyncoreConnection, self)._init_connection_state()
         # Enable our custom locking (thread-safe) buffer
         self.outbound_buffer = LockingSimpleBuffer()
+        self._buffer = ''
 
 
 class BrokerConnection(grok.GlobalUtility):
@@ -279,6 +280,7 @@ class BrokerConnection(grok.GlobalUtility):
             self.tx_select = tx_select
 
         self._callbacks = CallbackManager()  # callbacks are NOT thread-safe
+        self._reconnection_time = time.time()
         self._reconnection_delay = 1.0
 
         # BBB for affinitic.zamqp
@@ -327,6 +329,8 @@ class BrokerConnection(grok.GlobalUtility):
         self._connection.add_on_close_callback(self.reconnect)
 
     def reconnect(self, conn=None):
+        if time.time() > self._reconnection_time + 60:
+            self._reconnection_delay = 1.0
         if not getattr(self, '_reconnection_timeout', None):
             logger.info(u"Trying to reconnect connection '%s' in %s seconds",
                         self.connection_id, self._reconnection_delay)
@@ -347,7 +351,7 @@ class BrokerConnection(grok.GlobalUtility):
                        self.connection_id)
         self._connection = connection
         self._connection.channel(self.on_channel_open)
-        self._reconnection_delay = 1.0
+        self._reconnection_time = time.time()
 
     def on_channel_open(self, channel):
         logger.default(u"Channel for connection '%s' opened",
@@ -374,8 +378,14 @@ class BrokerConnection(grok.GlobalUtility):
     def on_channel_closed(self, code, text):
         logger.warning(u"Channel closed with reason '%s %s'",
                        code, text)
-        self._connection.close(code, text)
-        self.reconnect()
+        # With ZAMQP channel should only be closed when
+        # 1) connection is closed due ot any reason
+        # 2) permission or binding error from producer or consumer
+        self._connection.close(code, text)  # safe to call also during closing
+
+        # Enforce connection close because _connection.close() does not
+        # close socket when connection has been closed by RabbitMQ or network
+        self._connection._adapter_disconnect()
 
     def on_channel_tx_select(self, frame):
         self._callbacks.process(0, '_on_channel_open', self, self._channel)

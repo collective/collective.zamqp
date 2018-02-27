@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.16.2 (unreleased)
+0.16.2 (2018-02-27)
 -------------------
 
 - Fix issue where connection delay did not increment due to routing
